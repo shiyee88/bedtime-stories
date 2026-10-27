@@ -1,0 +1,1052 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Bedtime Stories</title>
+<meta name="description" content="Cosy tap-along bedtime stories in English, 中文 and Français.">
+<meta name="theme-color" content="#0b1033">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Bedtime">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" type="image/png" sizes="192x192" href="icon-192.png">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
+<style>:root{box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}body{margin:0;background:#0b1033}img{max-width:100%}[hidden]{display:none!important}html{overscroll-behavior:none}</style>
+</head>
+<body>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fredoka:wght@500;600;700&family=Nunito:wght@600;700;800&display=swap">
+<style>
+/* Layout: one calm column. Home = setup (heroes, sidekick, story). Story = stage, text, one interaction, big nav. The sky behind darkens page by page. */
+:root {
+  --bg: #0b1033;
+  --ink: #fff4dc;
+  --dim: #b5bdea;
+  --amber: #ffc857;
+  --amber-ink: #3a2400;
+  --mint: #7be0c3;
+  --rose: #ff9db1;
+  --panel: rgba(255,255,255,.08);
+  --line: rgba(255,255,255,.16);
+  --display: "Fredoka", "Trebuchet MS", "PingFang SC", "Microsoft YaHei", "Noto Sans SC", sans-serif;
+  --body: "Nunito", "Segoe UI", "PingFang SC", "Microsoft YaHei", "Noto Sans SC", sans-serif;
+  --fs: 1.4rem;
+  color-scheme: dark;
+}
+* { box-sizing: border-box; }
+html, body { min-height: 100%; }
+body {
+  background: var(--bg); color: var(--ink); font-family: var(--body); font-weight: 700;
+  padding-left: max(16px, env(safe-area-inset-left, 0px));
+  padding-right: max(16px, env(safe-area-inset-right, 0px));
+  -webkit-tap-highlight-color: transparent;
+}
+button { font: inherit; color: inherit; cursor: pointer; border: 0; background: none; }
+button:focus-visible, input:focus-visible, select:focus-visible { outline: 3px solid var(--mint); outline-offset: 3px; }
+h1, h2, h3 { font-family: var(--display); margin: 0; text-wrap: balance; }
+
+#sky { position: fixed; inset: 0; z-index: 0; transition: background 1.2s; }
+#sky::before {
+  content: ""; position: absolute; inset: 0; opacity: var(--stars, .4); transition: opacity 1.2s;
+  background-image:
+    radial-gradient(2px 2px at 8% 12%, #fff, transparent), radial-gradient(1.5px 1.5px at 22% 30%, #fff, transparent),
+    radial-gradient(2px 2px at 35% 8%, #ffe9a8, transparent), radial-gradient(1.5px 1.5px at 48% 22%, #fff, transparent),
+    radial-gradient(2px 2px at 62% 10%, #fff, transparent), radial-gradient(1.5px 1.5px at 74% 34%, #ffe9a8, transparent),
+    radial-gradient(2px 2px at 88% 16%, #fff, transparent), radial-gradient(1.5px 1.5px at 94% 44%, #fff, transparent),
+    radial-gradient(1.5px 1.5px at 14% 58%, #fff, transparent), radial-gradient(2px 2px at 82% 66%, #ffe9a8, transparent),
+    radial-gradient(1.5px 1.5px at 40% 80%, #fff, transparent), radial-gradient(2px 2px at 66% 90%, #fff, transparent);
+  animation: twinkle 5s ease-in-out infinite;
+}
+@keyframes twinkle { 50% { filter: brightness(.55); } }
+
+#app { position: relative; z-index: 1; max-width: 780px; margin: 0 auto; padding-block: 18px 28px; }
+
+/* ---------- home ---------- */
+.head { text-align: center; display: grid; gap: 8px; justify-items: center; padding-block: 10px 6px; }
+.moon { font-size: 64px; line-height: 1; filter: drop-shadow(0 0 22px rgba(255,200,87,.55)); animation: bobm 5s ease-in-out infinite; }
+.head h1 { font-size: clamp(2rem, 8vw, 3rem); font-weight: 700; letter-spacing: .01em; }
+.head p { margin: 0; color: var(--dim); max-width: 34ch; }
+.seg { display: inline-flex; background: var(--panel); border: 1px solid var(--line); border-radius: 999px; padding: 4px; gap: 2px; }
+.seg button { padding: 8px 18px; border-radius: 999px; font-weight: 800; min-height: 44px; }
+.seg button[aria-pressed="true"] { background: var(--amber); color: var(--amber-ink); }
+section.blk { margin-top: 26px; display: grid; gap: 10px; }
+section.blk h2 { font-size: 1.35rem; font-weight: 600; }
+.hint { color: var(--dim); margin: 0; font-size: .95rem; }
+.chips { display: flex; flex-wrap: wrap; gap: 10px; }
+.chip {
+  display: inline-flex; align-items: center; gap: 8px; padding: 10px 16px; min-height: 52px; border-radius: 16px;
+  background: var(--panel); border: 2px solid var(--line); font-size: 1.1rem;
+}
+.chip[aria-pressed="true"] { border-color: var(--amber); background: rgba(255,200,87,.16); }
+.chip .em { font-size: 1.5rem; }
+.chip .x { margin-left: 4px; color: var(--dim); padding: 4px 8px; font-size: 1.1rem; }
+form.add { display: flex; gap: 8px; flex-wrap: wrap; }
+form.add input, form.add select {
+  min-height: 48px; border-radius: 14px; border: 2px solid var(--line); background: rgba(255,255,255,.06);
+  color: var(--ink); padding: 0 14px; font: inherit; font-weight: 700; min-width: 0;
+}
+form.add input { flex: 1 1 160px; }
+.btn {
+  min-height: 56px; padding: 0 22px; border-radius: 18px; font-family: var(--display); font-weight: 600; font-size: 1.15rem;
+  background: var(--panel); border: 2px solid var(--line); display: inline-flex; align-items: center; justify-content: center; gap: 8px;
+}
+.btn.primary { background: var(--amber); color: var(--amber-ink); border-color: var(--amber); box-shadow: 0 6px 0 #b9852a; }
+.btn.primary:active:not(:disabled) { transform: translateY(4px); box-shadow: 0 2px 0 #b9852a; }
+.btn:disabled { opacity: .35; cursor: not-allowed; box-shadow: none; }
+.btn.round { width: 56px; padding: 0; font-size: 1.4rem; }
+.cards { display: grid; gap: 14px; grid-template-columns: repeat(auto-fit, minmax(210px, 1fr)); }
+.card {
+  text-align: left; border-radius: 22px; padding: 18px; min-height: 180px; display: grid; gap: 6px; align-content: start;
+  background: linear-gradient(160deg, var(--c1), var(--c2)); border: 2px solid var(--line);
+  transition: transform .15s;
+}
+.card:hover { transform: translateY(-3px) rotate(-.4deg); }
+.card .big { font-size: 56px; line-height: 1.1; }
+.card h3 { font-size: 1.25rem; font-weight: 600; }
+.card p { margin: 0; color: rgba(255,244,220,.82); font-size: .95rem; }
+.card small { color: var(--mint); font-weight: 800; }
+.switches { display: flex; gap: 10px; flex-wrap: wrap; }
+
+/* ---------- story ---------- */
+.top { display: flex; align-items: center; gap: 8px; }
+.top .btn { min-height: 48px; padding: 0 14px; border-radius: 14px; font-size: 1rem; }
+.top .btn.on { border-color: var(--amber); background: rgba(255,200,87,.18); }
+.prog { flex: 1; display: flex; gap: 4px; min-width: 0; }
+.prog i { flex: 1; height: 8px; border-radius: 4px; background: rgba(255,255,255,.16); }
+.prog i.f { background: var(--amber); }
+.stage {
+  position: relative; margin-top: 14px; height: clamp(230px, 38vh, 320px); border-radius: 26px; overflow: hidden;
+  border: 2px solid var(--line); background: linear-gradient(180deg, var(--s1), var(--s2));
+}
+.ground { position: absolute; inset: auto 0 0 0; height: 24%; background: var(--g); opacity: .8; }
+.art {
+  position: absolute; transform: translate(-50%, -50%); line-height: 1; padding: 6px;
+  font-size: calc(var(--z) * clamp(64px, 19vw, 112px)); animation: bob 4.5s ease-in-out infinite; animation-delay: var(--d);
+  filter: drop-shadow(0 6px 14px rgba(0,0,0,.3));
+}
+.art.wig { animation: wig .55s; }
+.chars { position: absolute; inset: auto 6px 6px 6px; display: flex; justify-content: center; gap: clamp(4px, 2vw, 14px); }
+.ch { display: grid; justify-items: center; min-width: 0; padding: 2px 4px; }
+.ch .em { font-size: clamp(34px, 9vw, 48px); line-height: 1.1; }
+.ch .nm { font-size: .75rem; font-weight: 800; background: rgba(0,0,0,.35); border-radius: 8px; padding: 0 7px; max-width: 18vw; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.ch.jump .em { animation: jump .5s; }
+.item {
+  position: absolute; transform: translate(-50%, -50%); font-size: clamp(44px, 12vw, 64px); line-height: 1; padding: 8px;
+  animation: drift 3.2s ease-in-out infinite; filter: drop-shadow(0 0 12px rgba(255,235,150,.9)); z-index: 3;
+}
+.bub {
+  position: absolute; transform: translate(-50%, 0); z-index: 5; background: #fff; color: #23265a; padding: 4px 12px; border-radius: 14px;
+  font-family: var(--display); font-weight: 600; white-space: nowrap; pointer-events: none; animation: floatup 1.3s forwards;
+}
+.textcard { margin-top: 14px; background: var(--panel); border: 1px solid var(--line); border-radius: 22px; padding: 18px 20px; display: grid; gap: 12px; }
+#txt { margin: 0; font-size: var(--fs); line-height: 1.6; font-weight: 700; max-width: 40ch; }
+html[lang="zh"] #txt { line-height: 1.85; letter-spacing: .03em; max-width: 24em; }
+#txt span { border-radius: 8px; transition: background .2s; padding: 0 2px; }
+#txt span.on { background: rgba(255,200,87,.28); }
+.word { justify-self: start; display: inline-flex; gap: 8px; align-items: center; font-size: .9rem; color: var(--dim); background: rgba(0,0,0,.2); border-radius: 12px; padding: 6px 12px; }
+.word b { color: var(--ink); }
+.word em { font-style: normal; font-size: 1.3rem; }
+#act { margin-top: 14px; display: grid; gap: 12px; justify-items: center; text-align: center; }
+#act .hint { font-size: 1.05rem; }
+.opts3 { display: grid; gap: 12px; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); width: 100%; }
+.opt { display: grid; gap: 4px; justify-items: center; padding: 14px 10px; min-height: 120px; border-radius: 20px; background: var(--panel); border: 2px solid var(--line); font-size: 1.05rem; }
+.opt:hover { border-color: var(--amber); }
+.opt .em { font-size: 48px; line-height: 1.1; }
+.result { background: rgba(123,224,195,.14); border: 2px solid rgba(123,224,195,.5); border-radius: 18px; padding: 14px 18px; font-size: calc(var(--fs) * .9); line-height: 1.55; text-align: left; width: 100%; }
+.stars { font-size: 1.9rem; letter-spacing: .15em; }
+.bigbtn {
+  width: 128px; height: 128px; border-radius: 50%; display: grid; place-items: center; align-content: center; gap: 2px;
+  background: radial-gradient(circle at 35% 30%, #ffe08a, var(--amber)); color: var(--amber-ink); box-shadow: 0 8px 0 #b9852a, 0 0 40px rgba(255,200,87,.4);
+  font-family: var(--display); font-weight: 700; font-size: 1.05rem;
+}
+.bigbtn .em { font-size: 48px; line-height: 1; }
+.bigbtn:active { transform: translateY(5px); box-shadow: 0 3px 0 #b9852a; }
+.bigbtn.ring { animation: ring .6s; }
+.breath { width: 190px; height: 190px; border-radius: 50%; display: grid; place-items: center; font-family: var(--display); font-size: 1.3rem; text-align: center;
+  background: radial-gradient(circle, rgba(123,224,195,.5), rgba(123,224,195,.08)); border: 2px solid rgba(123,224,195,.6); transform: scale(.55); transition: transform 4s ease-in-out; }
+.breath.in { transform: scale(1); }
+.goodnight { display: grid; gap: 14px; justify-items: center; padding: 10px 0; }
+.goodnight .moon { font-size: 84px; }
+.goodnight h2 { font-size: clamp(1.6rem, 6vw, 2.2rem); font-weight: 600; }
+.row { display: flex; gap: 10px; flex-wrap: wrap; justify-content: center; }
+.nav {
+  position: sticky; bottom: 0; margin-top: 18px; display: flex; gap: 10px; justify-content: space-between; align-items: center;
+  padding: 12px 0 calc(8px + env(safe-area-inset-bottom, 0px));
+}
+.nav .btn.primary { flex: 1; max-width: 260px; }
+.nav .btn.ghost { min-width: 110px; }
+.toast { position: fixed; left: 50%; bottom: calc(90px + env(safe-area-inset-bottom, 0px)); transform: translateX(-50%); background: #fff; color: #23265a; border-radius: 14px; padding: 10px 16px; z-index: 20; max-width: 90vw; }
+.enter { animation: enter .5s ease-out; }
+
+@keyframes bob { 50% { transform: translate(-50%, calc(-50% - 8px)); } }
+@keyframes bobm { 50% { transform: translateY(-8px); } }
+@keyframes drift { 25% { transform: translate(calc(-50% + 8px), calc(-50% - 6px)); } 75% { transform: translate(calc(-50% - 8px), calc(-50% + 6px)); } }
+@keyframes wig { 20% { transform: translate(-50%, -50%) rotate(-12deg) scale(1.15); } 60% { transform: translate(-50%, -50%) rotate(10deg) scale(1.1); } }
+@keyframes jump { 40% { transform: translateY(-22px) scale(1.2); } }
+@keyframes floatup { to { transform: translate(-50%, -34px); opacity: 0; } }
+@keyframes ring { 50% { transform: scale(1.12); } }
+@keyframes enter { from { opacity: 0; transform: translateY(14px); } }
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { animation-duration: .01ms !important; animation-iteration-count: 1 !important; transition-duration: .01ms !important; }
+}
+</style>
+
+<div id="sky"></div>
+<div id="app"></div>
+
+<script>
+const LANGS = ['en', 'zh', 'fr'];
+const LANG_LABEL = { en: 'EN', zh: '中文', fr: 'FR' };
+const TTS = { en: 'en-US', zh: 'zh-CN', fr: 'fr-FR' };
+const S = (en, zh, fr) => ({ en, zh, fr });
+
+/* ---------- interface strings ---------- */
+const UI = {
+  title: S('Bedtime Stories', '睡前故事书', 'Histoires du soir'),
+  sub: S('About 10 minutes of cosy, tap-along storytelling.', '大约10分钟，边听边玩的温柔小故事。', 'Environ 10 minutes d’histoire douce, à toucher et à écouter.'),
+  who: S('Who is in the story?', '谁是故事的主角？', 'Qui est dans l’histoire ?'),
+  whoHint: S('Tap a name to add or remove it.', '点一下名字，就可以加入或取消。', 'Touche un prénom pour l’ajouter ou le retirer.'),
+  addName: S('Add a name', '添加名字', 'Ajouter un prénom'),
+  add: S('Add', '添加', 'Ajouter'),
+  pal: S('Pick a sidekick', '选一个小伙伴', 'Choisis un compagnon'),
+  none: S('None', '不要', 'Aucun'),
+  pick: S('Choose a story', '选一个故事', 'Choisis une histoire'),
+  surprise: S('Surprise me!', '随机来一个！', 'Surprends-moi !'),
+  voice: S('Read aloud', '朗读', 'Lecture à voix haute'),
+  music: S('Lullaby', '摇篮曲', 'Berceuse'),
+  pages: S('pages', '页', 'pages'),
+  min: S('about 10 min', '约10分钟', 'environ 10 min'),
+  next: S('Next', '下一页', 'Suivant'),
+  back: S('Back', '上一页', 'Retour'),
+  choose: S('Choose one!', '选一个吧！', 'Choisis !'),
+  tapHint: S('Tap them all!', '全部点一点！', 'Touche-les tous !'),
+  soundHint: S('Press the button!', '按一下按钮！', 'Appuie sur le bouton !'),
+  word: S('Word of the page', '本页单词', 'Mot de la page'),
+  breathe: S('Let’s breathe together', '一起深呼吸', 'Respirons ensemble'),
+  in: S('Breathe in…', '吸气……', 'Inspire…'),
+  out: S('Breathe out…', '呼气……', 'Expire…'),
+  goodnight: S('Goodnight, {H}. Sweet dreams.', '晚安，{H}。做个好梦。', 'Bonne nuit, {H}. Fais de beaux rêves.'),
+  again: S('Read again', '再读一次', 'Relire'),
+  other: S('Another story', '换个故事', 'Une autre histoire'),
+  palLine: S('Even {pal} curled up and fell fast asleep.', '连{pal}也蜷起身子，呼呼睡着了。', 'Même {pal} s’enroule et s’endort profondément.'),
+  noVoice: S('This device has no voice for this language.', '这台设备没有这种语言的朗读声音。', 'Cet appareil n’a pas de voix pour cette langue.'),
+  home: S('Home', '回首页', 'Accueil'),
+};
+
+const PALS = [
+  { id: 'dog', e: '🐶', name: S('the puppy', '小狗', 'le chiot'), snd: S('Woof!', '汪汪！', 'Ouaf !'), f: 300 },
+  { id: 'cat', e: '🐱', name: S('the kitten', '小猫', 'le chaton'), snd: S('Meow!', '喵～', 'Miaou !'), f: 620 },
+  { id: 'bunny', e: '🐰', name: S('the bunny', '小兔子', 'le lapin'), snd: S('Hop hop!', '蹦蹦！', 'Hop hop !'), f: 480 },
+  { id: 'fox', e: '🦊', name: S('the little fox', '小狐狸', 'le petit renard'), snd: S('Yip yip!', '呦呦！', 'Ouin ouin !'), f: 700 },
+  { id: 'duck', e: '🐥', name: S('the duckling', '小鸭子', 'le caneton'), snd: S('Quack!', '嘎嘎！', 'Coin coin !'), f: 540 },
+];
+
+/* ---------- stories ---------- */
+/* tokens: {H} hero names, {they}/{They}, [one|many] verb/pronoun switch, {v:key}/{V:key} chosen noun, {pal} sidekick */
+const STORIES = [
+  {
+    id: 'moon', e: '🌙', c1: '#2b3a8f', c2: '#141b55', sky: ['#26307a', '#0e1345'], ground: '#1a2266',
+    title: S('The Moon’s Lost Pillow', '月亮丢了枕头', 'L’oreiller perdu de la Lune'),
+    blurb: S('Help Pip the star find the Moon’s fluffy pillow.', '帮小星星小皮找回月亮的软枕头。', 'Aide Pip l’étoile à retrouver l’oreiller de la Lune.'),
+    scenes: [
+      { type: 'n', art: ['🌟', '🌙', '☁️'], w: ['⭐', S('star', '星星', 'étoile')],
+        t: S(`Night had fallen, and the whole house was quiet. {H} sat by the window in cosy pyjamas, watching the twinkling sky. Tap, tap, tap! A tiny golden star was knocking on the glass. “Hello,” it whispered in a sparkly voice. “My name is Pip. Please, can you help me?”`,
+          `夜深了，整个房子静悄悄的。{H}穿着舒服的睡衣，坐在窗边看着闪闪发亮的星空。咚、咚、咚！一颗小小的金色星星在轻轻敲玻璃。“你好呀，”它用亮晶晶的声音小声说，“我叫小皮。[你|你们]能帮帮我吗？”`,
+          `La nuit est tombée et toute la maison est calme. {H} [regarde|regardent] le ciel étoilé par la fenêtre, en pyjama bien douillet. Toc, toc, toc ! Une toute petite étoile dorée frappe à la vitre. « Bonjour, murmure-t-elle d’une voix scintillante. Je m’appelle Pip. Pouvez-vous m’aider, s’il vous plaît ? »`) },
+      { type: 'choice', key: 'ride', art: ['🌙', '⭐', '✨'], w: ['🌙', S('moon', '月亮', 'lune')],
+        t: S(`“The Moon is so, so sleepy,” said Pip. “But he lost his fluffy pillow, and now he can’t close his eyes! We must find it before morning. How shall we travel?”`,
+          `“月亮好困好困呀，”小皮说，“可是它的软枕头不见了，怎么也闭不上眼睛！天亮以前，我们一定要找到它。我们怎么去呢？”`,
+          `« La Lune a tellement sommeil, dit Pip. Mais elle a perdu son oreiller tout doux et n’arrive plus à fermer les yeux ! Il faut le retrouver avant le matin. Comment allons-nous voyager ? »`),
+        opts: [
+          { e: '🚀', label: S('A little rocket', '小火箭', 'Une petite fusée'), noun: S('the rocket', '火箭', 'la fusée'),
+            res: S(`Whoosh! The little rocket zoomed up, up, up, over the rooftops and into the sky.`, `咻——小火箭一下子冲了出去，飞过屋顶，飞向天空！`, `Vroum ! La petite fusée décolle, plus haut que les toits, vers le ciel !`) },
+          { e: '☁️', label: S('A fluffy cloud', '软软的云朵', 'Un nuage moelleux'), noun: S('the cloud', '云朵', 'le nuage'),
+            res: S(`The fluffy cloud floated to the window, soft as a marshmallow, and carried everyone gently upwards.`, `软绵绵的云朵飘到窗边，像棉花糖一样柔软，轻轻托着大家往上飞。`, `Le nuage moelleux flotte jusqu’à la fenêtre, doux comme une guimauve, et emporte tout le monde vers le haut.`) },
+          { e: '🦄', label: S('A unicorn', '独角兽', 'Une licorne'), noun: S('the unicorn', '独角兽', 'la licorne'),
+            res: S(`The unicorn galloped up a staircase of sparkles and rainbows.`, `独角兽踩着闪闪发光的彩虹台阶，一路跑上了天。`, `La licorne galope sur un escalier d’étincelles et d’arcs-en-ciel.`) },
+        ] },
+      { type: 'n', art: ['🪐', '☄️', '☁️'], w: ['🪐', S('planet', '行星', 'planète')],
+        t: S(`The sky was like a big velvet blanket full of tiny lights. They passed a sleepy comet who snored “zzzz”, a planet wearing rings like a hula hoop, and a cloud shaped just like a bunny. “Did you see the bunny?” giggled Pip. “Everything up here is getting ready for bed.”`,
+          `夜空像一条大大的丝绒毯子，缀满了小小的灯。他们经过一颗正在打呼噜的小彗星，一颗戴着呼啦圈一样星环的行星，还有一朵像小兔子的云。“你们看到那只兔子了吗？”小皮咯咯地笑，“这里的一切都在准备睡觉呢。”`,
+          `Le ciel est comme une grande couverture de velours pleine de petites lumières. Ils passent près d’une comète endormie qui ronfle « zzzz », d’une planète avec des anneaux comme un cerceau, et d’un nuage en forme de lapin. « Avez-vous vu le lapin ? rigole Pip. Ici, tout se prépare pour la nuit. »`) },
+      { type: 'tap', emoji: '🌠', n: 3, art: ['🌌'], w: ['🌠', S('shooting star', '流星', 'étoile filante')],
+        t: S(`Suddenly, shooting stars zipped across the sky in every direction! “Quick!” cried Pip. “Catch three of them to light our way through the dark.”`,
+          `突然，流星从四面八方飞过夜空！“快！”小皮喊道，“抓住三颗流星，给我们照亮黑夜里的路！”`,
+          `Soudain, des étoiles filantes traversent le ciel dans tous les sens ! « Vite ! crie Pip. Attrapez-en trois pour éclairer notre chemin dans le noir ! »`),
+        done: S(`Hooray! Three bright stars lit up the sky like little lanterns.`, `太棒了！三颗亮晶晶的星星像小灯笼一样照亮了天空。`, `Hourra ! Trois étoiles brillantes éclairent le ciel comme de petites lanternes.`) },
+      { type: 'sound', btn: { e: '🦉', label: S('Hoo hoo!', '咕咕！', 'Hou hou !'), tone: 'owl' }, art: ['🦉', '☁️', '🌙'], w: ['🦉', S('owl', '猫头鹰', 'chouette')],
+        t: S(`Soon they met a wise old owl on a silver cloud. “Whooo is looking for a pillow?” she asked. “I saw something soft and white, far beyond Cloud Mountain. But first, say hello in a soft owl voice, so we don’t wake the sleeping birds.”`,
+          `不久，他们遇见了一只坐在银色云朵上的老猫头鹰。“咕——是谁在找枕头呀？”她问，“我在云朵山的那一边，看到了一个又软又白的东西。不过先用轻轻的猫头鹰声音打个招呼吧，别吵醒了睡觉的小鸟。”`,
+          `Bientôt, ils rencontrent une vieille chouette sage sur un nuage argenté. « Qui cherche un oreiller ? demande-t-elle. J’ai vu quelque chose de doux et de blanc, très loin derrière la Montagne des Nuages. Mais d’abord, dites bonjour tout doucement, comme une chouette, pour ne pas réveiller les oiseaux endormis. »`),
+        done: S(`“Perfect,” hooted the owl. “Follow the silver path, and mind the wind.”`, `“太棒了，”猫头鹰咕咕地说，“沿着银色的小路走，小心风哦。”`, `« Parfait, hulule la chouette. Suivez le chemin d’argent, et attention au vent. »`) },
+      { type: 'choice', key: 'peek', art: ['🏔️', '☁️', '🐑'], w: ['🐑', S('sheep', '小羊', 'mouton')],
+        t: S(`Beyond Cloud Mountain, three soft white shapes lay sleeping in the dark. Pip tiptoed closer. “Which one shall we peek at first?”`,
+          `在云朵山的那一边，三个又软又白的东西正在黑暗中睡觉。小皮踮着脚尖靠近。“我们先看哪一个呢？”`,
+          `Derrière la Montagne des Nuages, trois formes douces et blanches dorment dans le noir. Pip s’approche sur la pointe des pieds. « Laquelle regardons-nous en premier ? »`),
+        opts: [
+          { e: '☁️', label: S('A puffy cloud', '胖胖的云', 'Un gros nuage'), noun: S('the cloud', '云', 'le nuage'),
+            res: S(`The cloud puffed away like a big, soft sigh, and right behind it, there was the pillow!`, `云朵像一声长长的叹息，呼地飘走了。就在它的后面，枕头找到啦！`, `Le nuage s’envole comme un grand soupir tout doux, et juste derrière, il y a l’oreiller !`) },
+          { e: '🐑', label: S('A sleepy sheep', '瞌睡的小羊', 'Un mouton endormi'), noun: S('the sheep', '小羊', 'le mouton'),
+            res: S(`“Baa!” The sheep giggled and rolled over, and right underneath, there was the pillow!`, `“咩！”小绵羊咯咯笑着翻了个身，就在它的下面，枕头找到啦！`, `« Bêêê ! » Le mouton rigole et se retourne, et juste dessous, il y a l’oreiller !`) },
+          { e: '🍬', label: S('A marshmallow', '棉花糖', 'Une guimauve'), noun: S('the marshmallow', '棉花糖', 'la guimauve'),
+            res: S(`Nibble, nibble. Yum, sweet and squishy! And right next to it, there was the pillow!`, `咬一小口，嗯，又甜又软！就在它的旁边，枕头找到啦！`, `Grignote, grignote. Miam, doux et sucré ! Et juste à côté, il y a l’oreiller !`) },
+        ] },
+      { type: 'n', art: ['🌙', '🛏️', '💫'], w: ['🛏️', S('pillow', '枕头', 'oreiller')],
+        t: S(`There it was, the Moon’s fluffy pillow, shining like fresh snow! {H} hugged it tight. It smelled of warm milk and sweet dreams. Then {v:ride} carried everyone all the way back to the big, tired, smiling Moon.`,
+          `枕头在那儿！月亮的软枕头，像新雪一样闪闪发亮！{H}紧紧地抱住它，它闻起来有热牛奶和美梦的味道。然后{v:ride}载着大家，飞回了又大又困、笑眯眯的月亮身边。`,
+          `Le voilà, l’oreiller de la Lune, brillant comme de la neige fraîche ! {H} le [serre|serrent] fort dans [ses|leurs] bras. Il sent bon le lait chaud et les rêves doux. Puis {v:ride} les ramène jusqu’à la grande Lune fatiguée et souriante.`) },
+      { type: 'tap', emoji: '💤', n: 3, art: ['🌙', '🛏️'], w: ['💤', S('sleep', '睡觉', 'dormir')],
+        t: S(`The Moon gave the biggest yawn in the whole universe. {H} gently slid the pillow under the Moon’s big round cheek. “Now,” whispered Pip, “send three sleepy Zzz’s to help the Moon drift off.”`,
+          `月亮打了全宇宙最大的一个哈欠。{H}轻轻把枕头垫在月亮圆圆的脸蛋下面。“现在，”小皮悄悄地说，“送三个困困的呼噜给月亮，帮它睡着吧。”`,
+          `La Lune fait le plus grand bâillement de tout l’univers. {H} [glisse|glissent] doucement l’oreiller sous sa grosse joue ronde. « Maintenant, chuchote Pip, envoyez-lui trois gros Zzz pour l’aider à s’endormir. »`),
+        done: S(`Zzz… zzz… zzz… The Moon closed one eye, then the other.`, `呼……呼……呼……月亮先闭上一只眼睛，然后又闭上另一只。`, `Zzz… zzz… zzz… La Lune ferme un œil, puis l’autre.`) },
+      { type: 'sleep', art: ['🌙', '⭐', '💤'], w: ['😴', S('goodnight', '晚安', 'bonne nuit')],
+        t: S(`Peace settled over the sky. The Moon snored softly, the stars blinked slowly, and little Pip curled up on the windowsill, glowing a gentle gold. Everything was calm. Everything was quiet. Everything was ready for sleep.`,
+          `夜空安静下来。月亮轻轻地打着呼噜，星星慢慢地眨着眼睛，小皮蜷在窗台上，发着柔柔的金光。一切都那么平静，那么安静，一切都准备好睡觉了。`,
+          `Le calme se pose sur le ciel. La Lune ronfle doucement, les étoiles clignent lentement, et le petit Pip s’enroule sur le rebord de la fenêtre, tout doré. Tout est calme. Tout est silencieux. Tout est prêt pour dormir.`) },
+    ],
+  },
+  {
+    id: 'dragon', e: '🐉', c1: '#2a7a5a', c2: '#12363a', sky: ['#1f5b55', '#0c2528'], ground: '#0f3a2e',
+    title: S('The Little Dragon’s Night-light', '小龙的夜灯', 'La veilleuse du petit dragon'),
+    blurb: S('Ember the baby dragon is afraid of the dark.', '小龙小焰害怕黑暗，我们来帮帮它。', 'Braise, le bébé dragon, a peur du noir.'),
+    scenes: [
+      { type: 'n', art: ['🐉', '🌲', '🍄'], w: ['🐉', S('dragon', '龙', 'dragon')],
+        t: S(`Deep in the Whispering Forest, the trees were swaying and the owls were waking up. {H} tiptoed along a mossy path and heard a tiny sniffle. Behind a big rock sat a baby dragon, green as a pea and no bigger than a puppy, crying little sparks. “Hello,” it said, wiping its nose. “My name is Ember.”`,
+          `在悄悄话森林的深处，树枝轻轻摇摆，猫头鹰都醒来了。{H}踮着脚走在长满青苔的小路上，听见了一声小小的抽泣。大石头后面坐着一条小龙，像豌豆一样绿，只有小狗那么大，正哭得冒出小火星。“你好，”它擦擦鼻子说，“我叫小焰。”`,
+          `Au fond de la Forêt des Murmures, les arbres se balancent et les chouettes se réveillent. {H} [avance|avancent] sur la pointe des pieds le long d’un chemin de mousse et [entend|entendent] un tout petit reniflement. Derrière un gros rocher est assis un bébé dragon, vert comme un petit pois, pas plus grand qu’un chiot, qui pleure des étincelles. « Bonjour, dit-il en se frottant le nez. Je m’appelle Braise. »`) },
+      { type: 'choice', key: 'comfort', art: ['🐉', '💧'], w: ['🤗', S('hug', '拥抱', 'câlin')],
+        t: S(`“I can’t fall asleep,” sniffled Ember. “It’s so dark, and the dark is so big. I feel a little bit scared.” How shall we cheer up the little dragon?`,
+          `“我睡不着，”小焰抽抽搭搭地说，“天好黑，黑暗好大好大，我有一点点害怕。”我们怎么让小龙开心起来呢？`,
+          `« Je n’arrive pas à dormir, renifle Braise. Il fait si noir, et le noir est si grand. J’ai un tout petit peu peur. » Comment consoler le petit dragon ?`),
+        opts: [
+          { e: '🤗', label: S('Give a big hug', '抱一个大大的拥抱', 'Faire un gros câlin'), noun: S('the hug', '拥抱', 'le câlin'),
+            res: S(`Ember snuggled into the hug. It felt warm, like a hot-water bottle with scales.`, `小焰钻进大家的怀抱里，暖暖的，像一个带鳞片的热水袋。`, `Braise se blottit dans le câlin. C’est chaud, comme une bouillotte à écailles.`) },
+          { e: '🎵', label: S('Sing a lullaby', '唱一首摇篮曲', 'Chanter une berceuse'), noun: S('the song', '歌', 'la chanson'),
+            res: S(`Ember listened to the soft song and wiggled its tail in time with the music.`, `小焰听着轻轻的歌，尾巴跟着节拍一摇一摆。`, `Braise écoute la douce chanson et remue la queue en rythme.`) },
+          { e: '🍪', label: S('Share a cookie', '分享一块饼干', 'Partager un biscuit'), noun: S('the cookie', '饼干', 'le biscuit'),
+            res: S(`Munch, munch! Ember gobbled the cookie, and crumbs and tiny sparks flew everywhere.`, `嚓嚓嚓！小焰大口吃着饼干，饼干屑和小火星飞得到处都是。`, `Croc, croc ! Braise avale le biscuit, et des miettes et de petites étincelles volent partout.`) },
+        ] },
+      { type: 'n', art: ['🔥', '❓', '🌑'], w: ['🔥', S('fire', '火', 'feu')],
+        t: S(`“My little flame is my night-light,” Ember explained. “But it blew out when I hiccuped, and now my fire is too sleepy to wake up.” {H} thought and thought. Then {They} had an idea. “Fireflies! They glow all night long. Let’s go and find some!”`,
+          `“我的小火焰就是我的夜灯，”小焰解释说，“可是我打嗝的时候它被吹灭了，现在我的火太困了，醒不过来。”{H}想啊想，然后{they}有了主意。“萤火虫！它们整夜都会发光。我们去找几只吧！”`,
+          `« Ma petite flamme, c’est ma veilleuse, explique Braise. Mais elle s’est éteinte quand j’ai eu le hoquet, et maintenant mon feu est trop endormi pour se réveiller. » {H} [réfléchit|réfléchissent] longtemps. Puis {They} [a|ont] une idée. « Des lucioles ! Elles brillent toute la nuit. Allons en chercher ! »`) },
+      { type: 'tap', emoji: '✨', n: 3, art: ['🌲', '🌳'], w: ['✨', S('firefly', '萤火虫', 'luciole')],
+        t: S(`The forest was dark and still. “Shhh,” whispered Ember. “Tiptoe, tiptoe.” Look carefully between the leaves, and find three little fireflies.`,
+          `森林又黑又静。“嘘，”小焰悄悄地说，“踮起脚尖，轻轻走。”仔细看看树叶中间，找出三只小萤火虫吧。`,
+          `La forêt est sombre et silencieuse. « Chut, chuchote Braise. Sur la pointe des pieds. » Regardez bien entre les feuilles et trouvez trois petites lucioles.`),
+        done: S(`Three fireflies twirled into the jar and glowed like tiny golden lamps. Ember’s eyes grew round and happy.`, `三只萤火虫转着圈飞进了罐子，像三盏金色的小灯一样亮了起来。小焰的眼睛又圆又开心。`, `Les trois lucioles tourbillonnent dans le bocal et brillent comme de minuscules lampes dorées. Les yeux de Braise deviennent ronds et heureux.`) },
+      { type: 'choice', key: 'bed', art: ['🏠', '🌳', '🍄'], w: ['🏠', S('home', '家', 'maison')],
+        t: S(`Now Ember needed somewhere cosy to sleep. {H} looked around the forest. “Which place looks the snuggliest?”`,
+          `现在小焰需要一个温暖舒服的睡觉地方。{H}环顾四周的森林。“哪个地方看起来最舒服呢？”`,
+          `Maintenant, Braise a besoin d’un endroit douillet pour dormir. {H} [regarde|regardent] autour. « Quel endroit a l’air le plus confortable ? »`),
+        opts: [
+          { e: '🕳️', label: S('A little cave', '小山洞', 'Une petite grotte'), noun: S('the cave', '山洞', 'la grotte'),
+            res: S(`A round cave, dry and warm, with a floor of soft moss.`, `一个圆圆的山洞，又干又暖，地上铺着软软的青苔。`, `Une grotte ronde, sèche et chaude, avec de la mousse douce par terre.`) },
+          { e: '🌳', label: S('A hollow tree', '空心大树', 'Un tronc creux'), noun: S('the hollow tree', '空心树', 'le tronc creux'),
+            res: S(`A hollow tree, just the right size for a little dragon to curl up in.`, `一棵空心的大树，大小刚好够小龙蜷在里面。`, `Un vieux tronc creux, juste assez grand pour qu’un petit dragon s’y enroule.`) },
+          { e: '🍄', label: S('A mushroom house', '蘑菇屋', 'Une maison-champignon'), noun: S('the mushroom house', '蘑菇屋', 'la maison-champignon'),
+            res: S(`A big red mushroom house with a round door and a spotty roof.`, `一座大大的红蘑菇屋，有圆圆的门和点点的屋顶。`, `Une grande maison-champignon rouge, avec une porte ronde et un toit à pois.`) },
+        ] },
+      { type: 'sound', btn: { e: '🐉', label: S('Rawr…', '嗷呜……', 'Rawr…'), tone: 'roar' }, art: ['🐉', '🌲'], w: ['🌲', S('forest', '森林', 'forêt')],
+        t: S(`Dragons have a special goodnight roar, but a very quiet one, so it won’t wake the forest. “Rawr… rawr…” Ember practised. “Can you do a teeny tiny roar with me?”`,
+          `小龙有一种特别的晚安吼声，但是声音要很轻很轻，才不会吵醒森林。“嗷呜……嗷呜……”小焰练习着，“[你|你们]能和我一起吼一个小小小小的吗？”`,
+          `Les dragons ont un grand rugissement pour dire bonne nuit, mais tout doux, pour ne pas réveiller la forêt. « Rawr… rawr… » s’entraîne Braise. « Pouvez-vous faire un tout petit rugissement avec moi ? »`),
+        done: S(`A teeny tiny roar floated through the trees, and the forest sighed happily.`, `一声小小的吼叫飘过树林，森林开心地叹了口气。`, `Un tout petit rugissement flotte entre les arbres, et la forêt soupire de bonheur.`) },
+      { type: 'n', art: ['🐉', '🔥', '✨'], w: ['🏮', S('lantern', '灯笼', 'lanterne')],
+        t: S(`Ember’s tummy began to glow, warm and orange. Pop! A little flame appeared on its nose, just big enough for a night-light. “I’m not scared anymore!” cheered Ember. Together they walked to {v:bed}, the firefly jar swinging like a golden lantern.`,
+          `小焰的肚子开始发光，暖暖的橘色。啵！鼻尖上冒出了一朵小火苗，大小正好当夜灯。“我不害怕啦！”小焰欢呼着。大家一起朝{v:bed}走去，萤火虫罐子像金色的灯笼一样晃啊晃。`,
+          `Le ventre de Braise se met à briller, chaud et orange. Pop ! Une petite flamme apparaît sur son nez, juste assez grande pour une veilleuse. « Je n’ai plus peur ! » s’écrie Braise. Tous ensemble, ils marchent vers {v:bed}, le bocal de lucioles se balançant comme une lanterne dorée.`) },
+      { type: 'tap', emoji: '🍂', n: 3, art: ['🐉', '🍃'], w: ['🍂', S('leaf', '叶子', 'feuille')],
+        t: S(`It was a little cold and bare in {v:bed}. “We need a blanket!” said Ember. Everyone gathered the soft autumn leaves that had fallen on the ground. Tap three big leaves to cover the little dragon.`,
+          `{v:bed}里有点冷，也有点空。“我们需要一条毯子！”小焰说。大家把掉在地上的软软的秋叶收集起来。点一点三片大叶子，给小龙盖上吧。`,
+          `Il fait un peu froid et c’est tout vide dans {v:bed}. « Il nous faut une couverture ! » dit Braise. Tout le monde ramasse les douces feuilles d’automne tombées par terre. Touchez trois grandes feuilles pour couvrir le petit dragon.`),
+        done: S(`Leaf by leaf, a toasty blanket covered Ember from nose to tail.`, `一片又一片，一条暖烘烘的叶子毯子从鼻子到尾巴盖住了小焰。`, `Feuille après feuille, une couverture bien chaude couvre Braise du nez à la queue.`) },
+      { type: 'sleep', art: ['🐉', '✨', '🌙'], w: ['😴', S('goodnight', '晚安', 'bonne nuit')],
+        t: S(`Ember curled into a warm ball inside {v:bed}, the little flame glowing softly like a night-light. The fireflies hummed a quiet song, and even the trees seemed to yawn. Everything was calm. Everything was quiet. Everything was ready for sleep.`,
+          `小焰在{v:bed}里蜷成了一个暖暖的小球，鼻尖的小火苗像夜灯一样发着柔光。萤火虫哼着安静的歌，连树木好像也打起了哈欠。一切都那么平静，那么安静，一切都准备好睡觉了。`,
+          `Braise s’enroule en boule bien chaude dans {v:bed}, la petite flamme brillant doucement comme une veilleuse. Les lucioles fredonnent une chanson tranquille, et même les arbres semblent bâiller. Tout est calme. Tout est silencieux. Tout est prêt pour dormir.`) },
+    ],
+  },
+  {
+    id: 'ocean', e: '🐢', c1: '#1b78b4', c2: '#0b2f5a', sky: ['#14598f', '#071f40'], ground: '#0b3d63',
+    title: S('Tilly the Turtle Goes Home', '小海龟回家', 'Tilly la tortue rentre chez elle'),
+    blurb: S('Take baby turtle Tilly home across the moonlit sea.', '在月光下的大海里，送小海龟回家。', 'Ramène la petite tortue Tilly à la maison.'),
+    scenes: [
+      { type: 'n', art: ['🐢', '🏖️', '🐚'], w: ['🐢', S('turtle', '海龟', 'tortue')],
+        t: S(`At the end of a golden day, {H} walked along the warm sand. The sun was melting into the sea like orange ice cream. Splash! A tiny turtle wobbled out of the foam. “Hello, I’m Tilly,” she said in a bubbly voice. “The tide carried me away from my mama, and now I can’t find the way home.”`,
+          `在金色一天的最后，{H}走在温暖的沙滩上。太阳像橘子冰淇淋一样慢慢融进了大海。哗啦！一只小海龟摇摇晃晃地从泡沫里爬了出来。“你好，我叫小蒂，”她用咕噜咕噜的声音说，“潮水把我从妈妈身边带走了，我找不到回家的路了。”`,
+          `À la fin d’une journée dorée, {H} [marche|marchent] sur le sable tiède. Le soleil fond dans la mer comme une glace à l’orange. Plouf ! Une minuscule tortue sort de l’écume en se dandinant. « Bonjour, je m’appelle Tilly, dit-elle d’une voix pleine de bulles. La marée m’a emportée loin de ma maman, et je ne trouve plus le chemin de la maison. »`) },
+      { type: 'choice', key: 'ride', art: ['🌊', '🐢'], w: ['🌊', S('sea', '大海', 'mer')],
+        t: S(`“Don’t worry, Tilly,” said {H}. “We will help you find your mama!” But the sea is wide and deep. How shall we cross it?`,
+          `“别担心，小蒂，”{H}说，“我们一起帮你找妈妈！”可是大海又宽又深，我们怎么过去呢？`,
+          `« Ne t’inquiète pas, Tilly, [dit|disent] {H}. Nous allons t’aider à retrouver ta maman ! » Mais la mer est grande et profonde. Comment la traverser ?`),
+        opts: [
+          { e: '⛵', label: S('A little sailboat', '小帆船', 'Un petit voilier'), noun: S('the sailboat', '小帆船', 'le voilier'),
+            res: S(`The little sailboat caught the evening breeze and glided over the silver waves.`, `小帆船吃满了傍晚的微风，在银色的波浪上滑行。`, `Le petit voilier attrape la brise du soir et glisse sur les vagues argentées.`) },
+          { e: '🐬', label: S('A friendly dolphin', '友好的海豚', 'Un dauphin gentil'), noun: S('the dolphin', '海豚', 'le dauphin'),
+            res: S(`The dolphin clicked and whistled, “Hop on!”, and leaped through the waves.`, `海豚吱吱地叫着：“上来吧！”然后跃过了波浪。`, `Le dauphin siffle : « Montez ! » et bondit par-dessus les vagues.`) },
+          { e: '🐙', label: S('An octopus taxi', '章鱼出租车', 'Un taxi-pieuvre'), noun: S('the octopus', '章鱼', 'la pieuvre'),
+            res: S(`The octopus waved all eight arms. “Taxi!” it giggled, and off they swooshed.`, `章鱼挥动八条手臂，咯咯笑着说：“出租车来啦！”大家哗地一下出发了。`, `La pieuvre agite ses huit bras. « Taxi ! » rigole-t-elle, et hop, ils filent.`) },
+        ] },
+      { type: 'n', art: ['🐠', '🦀', '🐙'], w: ['🐠', S('fish', '小鱼', 'poisson')],
+        t: S(`Under the moonlight the sea turned silver and calm. Little fish carried tiny lanterns, jellyfish glowed pink and blue, and a crab waved a claw hello. “Everyone here is going to bed,” said Tilly. “Even the seaweed is swaying slowly, like a lullaby.”`,
+          `月光下，大海变成了银色，十分平静。小鱼提着小小的灯笼，水母发出粉色和蓝色的光，螃蟹举起大钳子打招呼。“这里的大家都要睡觉了，”小蒂说，“连海草也慢慢摇晃，像在唱摇篮曲。”`,
+          `Sous la lune, la mer devient argentée et calme. De petits poissons portent de minuscules lanternes, les méduses brillent en rose et en bleu, et un crabe salue de la pince. « Ici, tout le monde va se coucher, dit Tilly. Même les algues se balancent doucement, comme une berceuse. »`) },
+      { type: 'tap', emoji: '🫧', n: 3, art: ['🌊'], w: ['🫧', S('bubble', '泡泡', 'bulle')],
+        t: S(`Suddenly, a wall of bubbles blocked the way! “Pop, pop, pop!” laughed Tilly. “Pop three bubbles to make a path.”`,
+          `突然，一堵泡泡墙挡住了去路！“啵啵啵！”小蒂笑着说，“戳破三个泡泡，我们就有路了。”`,
+          `Soudain, un mur de bulles bloque le passage ! « Pop, pop, pop ! » rigole Tilly. « Éclatez trois bulles pour ouvrir un chemin. »`),
+        done: S(`Pop! Pop! Pop! The path opened, and the water sparkled like glitter.`, `啵！啵！啵！路开了，海水像撒了亮片一样闪闪发光。`, `Pop ! Pop ! Pop ! Le chemin s’ouvre, et l’eau scintille comme des paillettes.`) },
+      { type: 'sound', btn: { e: '🐳', label: S('Wooooo…', '呜——', 'Ouuuu…'), tone: 'whale' }, art: ['🌊', '🐳'], w: ['🐳', S('whale', '鲸鱼', 'baleine')],
+        t: S(`From far away, deep in the water, came a slow and beautiful song: “Wooooo…”. A whale! “Sing back, so she knows we are here!” said Tilly.`,
+          `从很远很远的深水里，传来了又慢又好听的歌声：“呜——”。是鲸鱼！“唱回去吧，让她知道我们在这里！”小蒂说。`,
+          `Très loin, au fond de l’eau, un chant lent et magnifique monte : « Ouuuu… ». Une baleine ! « Chantez en réponse, pour qu’elle sache que nous sommes là ! » dit Tilly.`),
+        done: S(`The whale heard the answer, and her song grew louder and warmer.`, `鲸鱼听到了回答，歌声变得更响亮、更温暖。`, `La baleine entend la réponse, et son chant devient plus fort et plus chaleureux.`) },
+      { type: 'n', art: ['🐳', '🌊', '⭐'], w: ['🎁', S('gift', '礼物', 'cadeau')],
+        t: S(`Out of the blue came a gentle whale, as big as a house, with the kindest eyes. “I know Tilly’s mama,” she said in a deep, slow voice. “She is waiting at the glowing reef, and she has been so worried. Bring her a little gift, and she will be so happy.”`,
+          `一头温柔的鲸鱼从蓝色的海水里游了出来，像房子一样大，眼睛特别善良。“我认识小蒂的妈妈，”她用低沉缓慢的声音说，“她正在发光的珊瑚礁等着呢，她担心极了。带一份小礼物给她，她会很开心的。”`,
+          `Du fond du bleu surgit une baleine douce, grande comme une maison, aux yeux pleins de bonté. « Je connais la maman de Tilly, dit-elle d’une voix grave et lente. Elle vous attend près du récif lumineux, et elle s’est tellement inquiétée. Apportez-lui un petit cadeau, elle sera si heureuse. »`) },
+      { type: 'choice', key: 'gift', art: ['🌊', '✨'], w: ['🐚', S('shell', '贝壳', 'coquillage')],
+        t: S(`On the sea floor, three treasures shimmered in the sand. Which one shall we bring to Mama Turtle?`,
+          `海底的沙子里，闪着三件宝贝。我们给海龟妈妈带哪一件呢？`,
+          `Au fond de la mer, trois trésors brillent dans le sable. Lequel apporter à Maman Tortue ?`),
+        opts: [
+          { e: '🐚', label: S('A pearly shell', '珍珠贝壳', 'Un coquillage nacré'), noun: S('a pearly shell', '一个珍珠贝壳', 'un coquillage nacré'),
+            res: S(`A shell that sang the sound of the sea when you held it close to your ear.`, `一个贝壳，贴在耳边就能听到大海的歌声。`, `Un coquillage qui chante le bruit de la mer quand on l’approche de l’oreille.`) },
+          { e: '⭐', label: S('A golden starfish', '金色海星', 'Une étoile de mer dorée'), noun: S('a golden starfish', '一只金色的海星', 'une étoile de mer dorée'),
+            res: S(`A starfish as golden as a little sun, warm in the palm of a hand.`, `一只像小太阳一样金黄的海星，捧在手心暖暖的。`, `Une étoile de mer dorée comme un petit soleil, tiède au creux de la main.`) },
+          { e: '💎', label: S('A shiny pearl', '亮晶晶的珍珠', 'Une perle brillante'), noun: S('a shiny pearl', '一颗亮晶晶的珍珠', 'une perle brillante'),
+            res: S(`A round pearl that glowed like a tiny moon.`, `一颗圆圆的珍珠，像小月亮一样发光。`, `Une perle ronde qui brille comme une petite lune.`) },
+        ] },
+      { type: 'n', art: ['🐢', '💗', '✨'], w: ['💗', S('family', '家人', 'famille')],
+        t: S(`At the glowing reef, Mama Turtle was waiting. “Tilly!” she cried, and hugged her baby with both flippers. {H} gave Mama Turtle {v:gift}. “Thank you for bringing my little one home,” she smiled, her eyes full of happy tears. Then {v:ride} carried everyone gently back to the shore.`,
+          `在发光的珊瑚礁，海龟妈妈正在等着。“小蒂！”她叫着，用两只鳍把宝宝紧紧抱住。{H}把{v:gift}送给了海龟妈妈。“谢谢你们把我的小宝贝送回来，”她笑着说，眼里满是开心的泪水。然后{v:ride}轻轻地把大家送回了岸边。`,
+          `Près du récif lumineux, Maman Tortue attend. « Tilly ! » s’écrie-t-elle, et elle serre son bébé dans ses deux nageoires. {H} [offre|offrent] {v:gift} à Maman Tortue. « Merci d’avoir ramené ma petite, sourit-elle, les yeux pleins de larmes de joie. » Puis {v:ride} ramène doucement tout le monde jusqu’au rivage.`) },
+      { type: 'tap', emoji: '🌊', n: 3, art: ['🌅', '🐢'], w: ['👋', S('wave', '浪花', 'vague')],
+        t: S(`The stars were coming out, one by one. Tilly and Mama Turtle floated beside the shore, ready to go home. “Goodnight, goodnight!” Wave goodbye by tapping three waves.`,
+          `星星一颗一颗地出来了。小蒂和海龟妈妈在岸边漂着，准备回家。“晚安，晚安！”点一点三朵浪花，向她们挥手告别吧。`,
+          `Les étoiles apparaissent une à une. Tilly et Maman Tortue flottent près du rivage, prêtes à rentrer. « Bonne nuit, bonne nuit ! » Dites au revoir en touchant trois vagues.`),
+        done: S(`The two turtles waved their flippers, and slowly sank into the sleepy blue.`, `两只小海龟挥动着鳍，慢慢游进了温柔的蓝色海水里。`, `Les deux tortues agitent leurs nageoires, puis s’enfoncent doucement dans le bleu endormi.`) },
+      { type: 'sleep', art: ['🌙', '🌊', '🐢'], w: ['😴', S('goodnight', '晚安', 'bonne nuit')],
+        t: S(`Back on the shore, the waves hummed a lullaby: shhh… shhh… Tilly was safe in her mama’s flippers, the stars were shining, and the sea gently rocked the whole world to sleep. Everything was calm. Everything was quiet. Everything was ready for sleep.`,
+          `回到岸边，海浪哼起了摇篮曲：嘘……嘘……小蒂安全地依偎在妈妈的鳍里，星星闪闪发光，大海轻轻摇着整个世界入睡。一切都那么平静，那么安静，一切都准备好睡觉了。`,
+          `De retour sur le rivage, les vagues fredonnent une berceuse : chhh… chhh… Tilly est en sécurité dans les nageoires de sa maman, les étoiles brillent, et la mer berce doucement le monde entier. Tout est calme. Tout est silencieux. Tout est prêt pour dormir.`) },
+    ],
+  },
+  /* ---- stories about racing cars, trains, a magic bus, bears ---- */
+  {
+    id: 'racer', e: '🏎️', c1: '#c0503a', c2: '#3b1d5a', sky: ['#5a2e6e', '#1d1244'], ground: '#2b2b3d',
+    title: S('The Little Race Car Goes to Bed', '小赛车要睡觉了', 'La petite voiture de course va se coucher'),
+    blurb: S('Zippy the race car takes one last, slow lap before bed.', '小赛车小闪跑完睡前最后一圈，慢慢的。', 'Flash, la voiture de course, fait un dernier tour tout doux avant de dormir.'),
+    scenes: [
+      { type: 'n', art: ['🏎️', '🏁', '🌆'], w: ['🏎️', S('race car', '赛车', 'voiture de course')],
+        t: S(`The big race was over, and the evening sun painted the track orange and pink. A little red race car named Zippy was still zooming around, round and round. “I’m not tired!” said Zippy, but {H} noticed that Zippy’s headlights were blinking sleepily. “Let’s take one last, slow, bedtime lap together.”`,
+          `大比赛结束了，傍晚的太阳把赛道染成了橙色和粉色。一辆叫小闪的红色小赛车还在一圈又一圈地跑。“我一点也不累！”小闪说，可是{H}发现它的车灯正困困地一闪一闪。“我们一起慢慢地跑最后一圈睡前赛吧。”`,
+          `La grande course est finie, et le soleil du soir peint la piste en orange et en rose. Une petite voiture de course rouge, Flash, tourne encore et encore. « Je ne suis pas fatiguée ! » dit Flash, mais {H} [remarque|remarquent] que ses phares clignotent de sommeil. « Faisons ensemble un dernier tour, tout doucement, avant de dormir. »`) },
+      { type: 'tap', emoji: '🔧', n: 3, art: ['🏎️', '💨'], w: ['🔧', S('wrench', '扳手', 'clé')],
+        t: S(`But Zippy’s engine was still buzzing like a bee. “Vroom-vroom-vroom!” Zippy giggled. “It won’t slow down!” {H} had an idea. Tap three little wrenches to turn the engine down to a soft purr.`,
+          `可是小闪的引擎还像小蜜蜂一样嗡嗡响。“呜——呜——呜！”小闪咯咯笑，“它慢不下来啦！”{H}想到了一个办法。点一点三把小扳手，把引擎调成轻轻的呼噜声。`,
+          `Mais le moteur de Flash bourdonne encore comme une abeille. « Vroum-vroum-vroum ! » rigole Flash. « Il ne veut pas ralentir ! » {H} [a|ont] une idée. Touchez trois petites clés pour baisser le moteur en un doux ronronnement.`),
+        done: S(`Brrr… brrr… brrr… Zippy’s engine slowed to a soft, cosy purr, like a sleepy cat.`, `嗡……嗡……嗡……小闪的引擎慢了下来，变成了轻轻的呼噜声，像一只困困的小猫。`, `Brrr… brrr… brrr… Le moteur de Flash ralentit et ronronne doucement, comme un chat endormi.`) },
+      { type: 'choice', key: 'road', art: ['🛣️', '🏎️', '🌙'], w: ['🛣️', S('road', '公路', 'route')],
+        t: S(`Zippy’s last lap could go three ways, and each one was lovely. “Which road should we take for our slow, sleepy lap?” asked Zippy.`,
+          `小闪的这一圈有三条路可以走，每一条都很美。“我们慢慢的睡前这一圈走哪条路好呢？”小闪问。`,
+          `Le dernier tour de Flash peut prendre trois routes, toutes belles. « Quelle route prenons-nous pour notre tour lent et tranquille ? » demande Flash.`),
+        opts: [
+          { e: '🌉', label: S('The twinkly bridge', '闪闪的大桥', 'Le pont scintillant'), noun: S('the bridge', '大桥', 'le pont'),
+            res: S(`They rolled over the bridge, where the lights twinkled on the water like stars.`, `他们开过大桥，桥下水面上的灯光像星星一样闪烁。`, `Ils roulent sur le pont, où les lumières scintillent sur l’eau comme des étoiles.`) },
+          { e: '🌲', label: S('The pine forest road', '松树林小路', 'La route des pins'), noun: S('the forest road', '松树林小路', 'la route de la forêt'),
+            res: S(`They rolled through the pine forest, where the air smelled fresh and the trees whispered “shhh”.`, `他们开进松树林，空气清新，树木轻轻地说着“嘘”。`, `Ils roulent dans la forêt de pins, où l’air sent bon et où les arbres chuchotent « chut ».`) },
+          { e: '🏖️', label: S('The seaside road', '海边公路', 'La route de la mer'), noun: S('the seaside road', '海边公路', 'la route de la mer'),
+            res: S(`They rolled beside the sea, where the waves went in and out, in and out, slow and sleepy.`, `他们沿着海边开，海浪一进一出，一进一出，又慢又困。`, `Ils longent la mer, où les vagues vont et viennent, lentes et endormies.`) },
+        ] },
+      { type: 'sound', btn: { e: '🚗', label: S('Beep beep!', '嘟嘟！', 'Pip pip !'), tone: 'beep' }, art: ['🚦', '🏎️'], w: ['🚦', S('traffic light', '红绿灯', 'feu tricolore')],
+        t: S(`A friendly traffic light blinked up ahead. “Little cars say goodnight with a soft horn,” said Zippy. “Beep… beep…” Can you do a tiny, quiet beep with me?`,
+          `前面一盏友好的红绿灯在闪烁。“小汽车用轻轻的喇叭说晚安，”小闪说，“嘟……嘟……”[你|你们]能和我一起轻轻地嘟两声吗？`,
+          `Un feu tricolore sympathique clignote devant eux. « Les petites voitures disent bonne nuit avec un klaxon tout doux, dit Flash. Pip… pip… » [Peux-tu|Pouvez-vous] faire un tout petit pip avec moi ?`),
+        done: S(`The traffic light turned from red to green, then to a soft, sleepy yellow. “Goodnight, little car,” it hummed.`, `红绿灯从红色变成绿色，又变成柔柔的、困困的黄色。“晚安，小汽车，”它哼着。`, `Le feu passe du rouge au vert, puis à un jaune doux et endormi. « Bonne nuit, petite voiture », fredonne-t-il.`) },
+      { type: 'n', art: ['🌙', '🐱', '🥖'], w: ['🐱', S('cat', '小猫', 'chat')],
+        t: S(`Zippy rolled past sleepy things: a cat curled up on a wall, a bakery with its lights turned low, and the moon rolling along like a friendly ball. Zippy’s wheels went slower… and slower… “Going by {v:road} was the best idea,” yawned Zippy.`,
+          `小闪慢慢开过一个个困困的地方：墙头上蜷成一团的小猫，灯光调得暗暗的面包店，还有像友好的大皮球一样跟着滚的月亮。小闪的轮子越转越慢，越转越慢……“走{v:road}真是个好主意，”小闪打着哈欠说。`,
+          `Flash passe devant des choses endormies : un chat roulé en boule sur un mur, une boulangerie aux lumières baissées, et la lune qui roule à côté comme un gentil ballon. Les roues de Flash vont plus lentement… et encore plus lentement… « Passer par {v:road} était une super idée », bâille Flash.`) },
+      { type: 'choice', key: 'blanket', art: ['🏠', '🏎️', '🌙'], w: ['🏠', S('garage', '车库', 'garage')],
+        t: S(`At the garage, a warm little parking spot was waiting, with a sign that said “Zippy”. “But I’m a bit chilly,” said Zippy. What can we tuck around the little race car?`,
+          `在车库里，一个暖暖的小停车位在等着，上面挂着写着“小闪”的牌子。“可是我有点冷，”小闪说。我们用什么来给小赛车盖一盖呢？`,
+          `Au garage, une petite place bien chaude attend Flash, avec un panneau « Flash ». « Mais j’ai un peu froid », dit Flash. Avec quoi border la petite voiture de course ?`),
+        opts: [
+          { e: '🧣', label: S('A cosy scarf', '暖暖的围巾', 'Une écharpe douillette'), noun: S('a cosy scarf', '一条暖暖的围巾', 'une écharpe douillette'),
+            res: S(`The scarf wrapped around Zippy’s front like a big, soft hug.`, `围巾绕在小闪的车头上，像一个又大又软的拥抱。`, `L’écharpe entoure l’avant de Flash comme un grand câlin tout doux.`) },
+          { e: '🛏️', label: S('A fluffy blanket', '毛绒绒的毯子', 'Une couverture moelleuse'), noun: S('a fluffy blanket', '一条毛绒绒的毯子', 'une couverture moelleuse'),
+            res: S(`The fluffy blanket covered Zippy from bumper to bumper.`, `毛绒绒的毯子从车头到车尾盖住了小闪。`, `La couverture moelleuse couvre Flash d’un pare-chocs à l’autre.`) },
+          { e: '🧦', label: S('Four warm socks', '四只暖暖的袜子', 'Quatre chaussettes chaudes'), noun: S('four warm socks', '四只暖暖的袜子', 'quatre chaussettes chaudes'),
+            res: S(`One sock for each wheel! Zippy wiggled all four and giggled.`, `每个轮子一只袜子！小闪晃了晃四个轮子，咯咯地笑了。`, `Une chaussette pour chaque roue ! Flash remue ses quatre roues et rigole.`) },
+        ] },
+      { type: 'tap', emoji: '💡', n: 3, art: ['🏎️', '🌙'], w: ['💡', S('light', '灯', 'lampe')],
+        t: S(`Now it was time to turn off the lights, one by one. Tap three little lights, and watch the garage get cosy and dim.`,
+          `现在该一盏一盏把灯关掉了。点一点三盏小灯，看看车库怎样变得暗暗的、舒舒服服的。`,
+          `Il est temps d’éteindre les lumières, une par une. Touchez trois petites lampes et regardez le garage devenir doux et sombre.`),
+        done: S(`Click… click… click… The garage glowed softly with only the moonlight.`, `嗒……嗒……嗒……车库里只剩下月光，柔柔地亮着。`, `Clic… clic… clic… Le garage ne brille plus que de la douce lumière de la lune.`) },
+      { type: 'sleep', art: ['🏎️', '🌙', '⭐'], w: ['😴', S('goodnight', '晚安', 'bonne nuit')],
+        t: S(`Zippy settled into the garage, snug with {v:blanket}, headlights closed like sleepy eyes. The engine purred softly: brrr… brrr… Outside, the road was quiet, and tomorrow’s race could wait. Everything was calm. Everything was quiet. Everything was ready for sleep.`,
+          `小闪停进车库，盖着{v:blanket}，车灯像困困的眼睛一样闭上了。引擎轻轻地呼噜：嗡……嗡……外面的公路静悄悄的，明天的比赛可以明天再说。一切都那么平静，那么安静，一切都准备好睡觉了。`,
+          `Flash se gare dans le garage, bien au chaud avec {v:blanket}, les phares fermés comme des yeux endormis. Le moteur ronronne doucement : brrr… brrr… Dehors, la route est calme, et la course de demain peut attendre. Tout est calme. Tout est silencieux. Tout est prêt pour dormir.`) },
+    ],
+  },
+  {
+    id: 'train', e: '🚂', c1: '#3a6e8f', c2: '#1c2a55', sky: ['#2c4a7a', '#10183f'], ground: '#22304f',
+    title: S('The Little Night Train', '夜行小火车', 'Le petit train de nuit'),
+    blurb: S('Choo the little engine delivers cosy things to sleepy stations.', '小火车呜呜把暖暖的东西送到困困的车站。', 'Tchou, la petite locomotive, livre des douceurs dans des gares endormies.'),
+    scenes: [
+      { type: 'n', art: ['🚂', '🚉', '🌙'], w: ['🚂', S('train', '火车', 'train')],
+        t: S(`At the little station on the hill, Choo the steam engine puffed out a tiny cloud. Every night, Choo carried cosy things to the sleepy villages along the track. “Toot-toot!” said Choo. “{H}, will you be my helpers tonight? There are three stations waiting.”`,
+          `山坡上的小车站里，小火车呜呜呼出一小朵白云。每天晚上，呜呜都要把暖暖的东西送给铁轨边困困的村子。“呜——呜！”呜呜说，“{H}，今晚[你愿意|你们愿意]当我的小帮手吗？有三个车站在等着呢。”`,
+          `À la petite gare sur la colline, Tchou la locomotive souffle un minuscule nuage. Chaque nuit, Tchou apporte des choses douillettes aux villages endormis le long de la voie. « Tut-tut ! dit Tchou. {H}, [veux-tu|voulez-vous] être mes aides ce soir ? Trois gares nous attendent. »`) },
+      { type: 'choice', key: 'cargo', art: ['📦', '🚂'], w: ['📦', S('crate', '箱子', 'caisse')],
+        t: S(`The station master pointed to three big crates. “What shall we load onto the train first?” asked Choo. “Something for the sleepy villages.”`,
+          `站长指着三个大箱子。“我们先把什么装上火车呢？”呜呜问，“要送给困困的村子的东西。”`,
+          `Le chef de gare montre trois grandes caisses. « Qu’est-ce qu’on charge en premier ? demande Tchou. Quelque chose pour les villages endormis. »`),
+        opts: [
+          { e: '🧸', label: S('Teddy bears', '玩具熊', 'Des oursons'), noun: S('the teddy bears', '玩具熊', 'les oursons'),
+            res: S(`Thump, thump, thump! The teddy bears bounced into the wagon, each one with a sleepy smile.`, `咚、咚、咚！玩具熊们蹦进了车厢，每只都带着困困的笑容。`, `Boum, boum, boum ! Les oursons sautent dans le wagon, chacun avec un sourire endormi.`) },
+          { e: '📚', label: S('Bedtime books', '睡前故事书', 'Des livres du soir'), noun: S('the bedtime books', '睡前故事书', 'les livres du soir'),
+            res: S(`The books slid in neatly, their pages smelling of old, kind stories.`, `故事书整整齐齐地滑进车厢，书页闻起来有温柔老故事的味道。`, `Les livres glissent bien rangés, leurs pages sentent les vieilles histoires douces.`) },
+          { e: '🥛', label: S('Warm milk', '热牛奶', 'Du lait chaud'), noun: S('the warm milk', '热牛奶', 'le lait chaud'),
+            res: S(`The warm milk went on board, steaming gently in little cups.`, `热牛奶装进车厢，在小杯子里轻轻冒着热气。`, `Le lait chaud monte à bord, fumant doucement dans de petites tasses.`) },
+        ] },
+      { type: 'sound', btn: { e: '🚂', label: S('Choo choo!', '呜呜！', 'Tchou tchou !'), tone: 'choo' }, art: ['🚂', '⛰️', '💨'], w: ['🎺', S('whistle', '汽笛', 'sifflet')],
+        t: S(`“All aboard!” called the station master. Choo’s wheels began to turn: chuff… chuff… chuff… “Trains say hello with a soft whistle,” said Choo. “Can you whistle with me? Choo choo!”`,
+          `“请上车！”站长喊道。呜呜的轮子开始转动：咔嚓……咔嚓……咔嚓……“火车用轻轻的汽笛打招呼，”呜呜说，“[你|你们]能和我一起吹汽笛吗？呜呜！”`,
+          `« En voiture ! » crie le chef de gare. Les roues de Tchou se mettent à tourner : tchouf… tchouf… tchouf… « Les trains disent bonjour avec un petit sifflet doux, dit Tchou. [Peux-tu|Pouvez-vous] siffler avec moi ? Tchou tchou ! »`),
+        done: S(`The whistle floated over the hills, and a few windows lit up to say hello back.`, `汽笛声飘过山丘，几扇窗户亮了起来，像是在回应问好。`, `Le sifflet flotte au-dessus des collines, et quelques fenêtres s’allument pour répondre.`) },
+      { type: 'n', art: ['🏮', '🚂', '🌙'], w: ['🏮', S('lantern', '灯笼', 'lanterne')],
+        t: S(`At the first station, a little girl and her granny were waiting under a lantern. {H} handed them {v:cargo}. “Thank you!” they whispered, so as not to wake the village. The train waved its steam, and chuffed on, slower now.`,
+          `第一个车站，一个小女孩和奶奶在灯笼下等着。{H}把{v:cargo}递给她们。“谢谢！”她们小声说，不想吵醒村子。火车挥了挥白色的蒸汽，慢慢地开走了。`,
+          `À la première gare, une petite fille et sa grand-mère attendent sous une lanterne. {H} leur [donne|donnent] {v:cargo}. « Merci ! » chuchotent-elles pour ne pas réveiller le village. Le train agite sa vapeur et repart, plus lentement.`) },
+      { type: 'tap', emoji: '🐑', n: 3, art: ['⛰️', '🌿'], w: ['🐑', S('sheep', '绵羊', 'mouton')],
+        t: S(`Next, the track curved around a green hill where the sheep were sleeping. “Let’s count them softly,” whispered Choo. Tap three sheep, one at a time.`,
+          `接着，铁轨弯弯地绕过一座绿色的山坡，羊儿们正在睡觉。“我们轻轻地数一数吧，”呜呜小声说。一次点一只小羊。`,
+          `Ensuite, la voie tourne autour d’une colline verte où dorment les moutons. « Comptons-les tout doucement », chuchote Tchou. Touchez trois moutons, un par un.`),
+        done: S(`One… two… three… Three woolly sheep, fast asleep. Choo smiled.`, `一……二……三……三只毛茸茸的绵羊，睡得好香。呜呜笑了。`, `Un… deux… trois… Trois moutons laineux, profondément endormis. Tchou sourit.`) },
+      { type: 'choice', key: 'tunnel', art: ['🚇', '🚂'], w: ['🚇', S('tunnel', '隧道', 'tunnel')],
+        t: S(`Ahead lay a long, dark tunnel. “Hmm,” said Choo, “it’s very dark in there. What shall we do?”`,
+          `前面是一条又长又黑的隧道。“嗯，”呜呜说，“里面好黑呀。我们怎么办呢？”`,
+          `Devant eux, un long tunnel sombre. « Hmm, dit Tchou, il fait très noir là-dedans. Que faisons-nous ? »`),
+        opts: [
+          { e: '🔦', label: S('Switch on the headlamp', '打开车灯', 'Allumer le phare'),
+            res: S(`The headlamp made a warm yellow circle, and the tunnel walls sparkled like sugar.`, `车灯照出一个暖黄色的圆圈，隧道的墙壁像糖一样闪闪发亮。`, `Le phare dessine un cercle jaune et chaud, et les murs du tunnel brillent comme du sucre.`) },
+          { e: '🎵', label: S('Hum a song', '哼一首歌', 'Fredonner une chanson'),
+            res: S(`They hummed together, and the tunnel hummed back in a deep, friendly echo.`, `大家一起哼着歌，隧道也用低低的、友好的回声哼了回来。`, `Ils fredonnent ensemble, et le tunnel répond par un écho grave et amical.`) },
+          { e: '✨', label: S('Look for glow-worms', '找发光的小虫', 'Chercher des vers luisants'),
+            res: S(`Little glow-worms lit up the ceiling, twinkling like a sky of tiny stars.`, `小小的萤火虫点亮了洞顶，像一片小小的星空。`, `De petits vers luisants éclairent le plafond, comme un ciel de minuscules étoiles.`) },
+        ] },
+      { type: 'n', art: ['🚉', '🌙', '🏘️'], w: ['🏘️', S('village', '村子', 'village')],
+        t: S(`At the last station, the sleepiest village of all was waiting. Everyone there was already in pyjamas! The train gently puffed to a stop: chuff… chuff… chuff… “All delivered,” said Choo with a big, warm yawn. “Now it’s my bedtime too.”`,
+          `最后一站，是最困最困的村子。那里的人们都已经穿好了睡衣！火车轻轻地喷着气停了下来：咔嚓……咔嚓……咔嚓……“都送到啦，”呜呜打了个大大的、暖暖的哈欠，“现在轮到我睡觉了。”`,
+          `À la dernière gare, le village le plus endormi de tous attend. Tout le monde y est déjà en pyjama ! Le train s’arrête doucement : tchouf… tchouf… tchouf… « Tout est livré, dit Tchou dans un grand bâillement tout chaud. Maintenant, c’est l’heure de dormir pour moi aussi. »`) },
+      { type: 'tap', emoji: '💨', n: 3, art: ['🚂', '🏠'], w: ['☁️', S('cloud', '云', 'nuage')],
+        t: S(`Choo rolled into the engine shed. “One last thing,” whispered Choo. “My steam must go to sleep too.” Tap three puffs of steam and watch them float up like sleepy clouds.`,
+          `呜呜慢慢开进了车棚。“还有最后一件事，”呜呜小声说，“我的蒸汽也要去睡觉了。”点一点三团蒸汽，看它们像困困的云朵一样飘上天。`,
+          `Tchou roule jusqu’au hangar. « Une dernière chose, chuchote Tchou. Ma vapeur doit aller dormir aussi. » Touchez trois bouffées de vapeur et regardez-les monter comme des nuages endormis.`),
+        done: S(`Puff… puff… puff… The steam floated up and became three little clouds, tucked beside the moon.`, `呼……呼……呼……蒸汽飘上天空，变成了三朵小云，依偎在月亮旁边。`, `Pouf… pouf… pouf… La vapeur monte et devient trois petits nuages, blottis près de la lune.`) },
+      { type: 'sleep', art: ['🚂', '🌙', '⭐'], w: ['😴', S('goodnight', '晚安', 'bonne nuit')],
+        t: S(`Choo rested in the engine shed, wheels still, lantern low. The whole railway was quiet, and the stars watched over the tracks like tiny signal lights. Everything was calm. Everything was quiet. Everything was ready for sleep.`,
+          `呜呜停在车棚里，轮子不动了，灯光调得暗暗的。整条铁路静悄悄的，星星像小小的信号灯一样守护着铁轨。一切都那么平静，那么安静，一切都准备好睡觉了。`,
+          `Tchou se repose dans le hangar, roues immobiles, lanterne baissée. Toute la voie ferrée est silencieuse, et les étoiles veillent sur les rails comme de minuscules signaux. Tout est calme. Tout est silencieux. Tout est prêt pour dormir.`) },
+    ],
+  },
+  {
+    id: 'bus', e: '🚌', c1: '#8a5a2b', c2: '#2a2a4a', sky: ['#4a3a6a', '#141230'], ground: '#2e2438',
+    title: S('The Magic Bus and the Sleepy Bear', '神奇小巴士和瞌睡熊', 'Le bus magique et l’ours endormi'),
+    blurb: S('A bus that shrinks goes on a tiny trip to help a bear fall asleep.', '会变小的巴士，去帮一只小熊睡着。', 'Un bus qui rétrécit part aider un ours à s’endormir.'),
+    scenes: [
+      { type: 'n', art: ['🚌', '🐻', '🌲'], w: ['🚌', S('bus', '巴士', 'bus')],
+        t: S(`On the edge of the forest, a bright yellow bus called Dot had a very special trick: Dot could shrink! “Hop in, explorers,” said Dot. “Tonight we have a mystery to solve. A big bear named Bruno can’t fall asleep, and nobody knows why.”`,
+          `森林边上，有一辆亮黄色的巴士叫点点，它会一个很特别的魔法：变小！“上车吧，小探险家们，”点点说，“今晚我们有一个谜要解开。有一只叫布鲁的大熊睡不着，谁也不知道为什么。”`,
+          `À l’orée de la forêt, un bus jaune vif nommé Dot sait faire un tour très spécial : il peut rétrécir ! « Montez, petits explorateurs, dit Dot. Ce soir, nous avons un mystère à résoudre. Un gros ours nommé Bruno n’arrive pas à dormir, et personne ne sait pourquoi. »`) },
+      { type: 'tap', emoji: '✨', n: 3, art: ['🚌', '🌱'], w: ['🔍', S('tiny', '很小', 'minuscule')],
+        t: S(`“To find out, we must get small,” said Dot. “Tap three sparkles, and we’ll shrink down, down, down.”`,
+          `“要查清楚，我们得变小，”点点说，“点一点三颗亮晶晶，我们就会变小，变小，再变小。”`,
+          `« Pour savoir, il faut devenir tout petits, dit Dot. Touchez trois étincelles, et nous rétrécirons, rétrécirons, rétrécirons. »`),
+        done: S(`Pop! The bus was now as tiny as a toy, and the grass looked as tall as trees.`, `啵！巴士变得像玩具一样小，青草看起来像大树那么高。`, `Pop ! Le bus est maintenant minuscule comme un jouet, et l’herbe paraît grande comme des arbres.`) },
+      { type: 'choice', key: 'path', art: ['🍄', '🌼', '🪵'], w: ['🔎', S('clue', '线索', 'indice')],
+        t: S(`With the bus tiny, the forest floor looked like a whole new world. “A good scientist looks carefully,” said Dot. “Which way shall we search for clues about Bruno?”`,
+          `巴士变小以后，森林的地面看起来像一个全新的世界。“好的科学家会仔细观察，”点点说，“我们往哪边去找布鲁的线索呢？”`,
+          `Le bus est tout petit, et le sol de la forêt ressemble à un monde nouveau. « Un bon scientifique observe avec soin, dit Dot. Par où cherchons-nous des indices sur Bruno ? »`),
+        opts: [
+          { e: '🍄', label: S('Through the mushrooms', '穿过蘑菇丛', 'Entre les champignons'),
+            res: S(`They bumped along between giant mushrooms, whose caps glowed in the dark.`, `他们在巨大的蘑菇之间一颠一颠地前进，蘑菇帽在黑暗里发着光。`, `Ils cahotent entre d’énormes champignons dont les chapeaux brillent dans le noir.`) },
+          { e: '🌼', label: S('Across the flower meadow', '越过花草地', 'Sur la prairie fleurie'),
+            res: S(`They rolled across the meadow, where sleepy flowers had folded their petals shut.`, `他们开过草地，困困的花儿已经合上了花瓣。`, `Ils roulent sur la prairie où les fleurs endormies ont refermé leurs pétales.`) },
+          { e: '🪵', label: S('Along the old log', '沿着老树干', 'Sur le vieux tronc'),
+            res: S(`They drove along the old log like a long, bumpy bridge, with beetles waving from the bark.`, `他们沿着老树干开，像开在一座长长的、颠颠的桥上，树皮上的甲虫在挥手。`, `Ils roulent sur le vieux tronc comme sur un long pont cahoteux, et les scarabées saluent depuis l’écorce.`) },
+        ] },
+      { type: 'sound', btn: { e: '🐻', label: S('Hmmmm…', '嗯——', 'Hmmmm…'), tone: 'hum' }, art: ['🐻', '🕳️'], w: ['🐻', S('bear', '熊', 'ours')],
+        t: S(`At the end of the path they found a huge cave with a pair of enormous furry feet. It was Bruno! “I can’t sleep,” Bruno sighed. “My tummy is rumbling.” Dot whispered, “Bears hum to calm their tummies. Can you hum with Bruno? Hmmmm…”`,
+          `小路尽头有一个大大的山洞，里面露出一双巨大的毛茸茸的脚。是布鲁！“我睡不着，”布鲁叹了口气，“我的肚子咕咕叫。”点点小声说：“小熊会哼歌来安抚肚子。[你|你们]能和布鲁一起哼吗？嗯——”`,
+          `Au bout du chemin, ils trouvent une immense grotte avec deux énormes pieds poilus. C’est Bruno ! « Je n’arrive pas à dormir, soupire Bruno. Mon ventre gargouille. » Dot chuchote : « Les ours fredonnent pour calmer leur ventre. [Peux-tu|Pouvez-vous] fredonner avec Bruno ? Hmmmm… »`),
+        done: S(`Hmmmm… The cave hummed softly, and Bruno’s tummy grew quiet and warm.`, `嗯——山洞里轻轻回荡着哼声，布鲁的肚子安静下来，暖暖的。`, `Hmmmm… La grotte résonne doucement, et le ventre de Bruno devient calme et chaud.`) },
+      { type: 'choice', key: 'snack', art: ['🐻', '🍯'], w: ['🍯', S('honey', '蜂蜜', 'miel')],
+        t: S(`“Before a long sleep, bears like a little snack,” explained Dot. Bruno’s tummy rumbled again. What should we bring him?`,
+          `“长长地睡一觉之前，小熊喜欢吃一点点心，”点点解释说。布鲁的肚子又咕咕叫了。我们给他带什么好呢？`,
+          `« Avant un long sommeil, les ours aiment un petit en-cas », explique Dot. Le ventre de Bruno gargouille encore. Que lui apporter ?`),
+        opts: [
+          { e: '🍯', label: S('A drop of honey', '一滴蜂蜜', 'Une goutte de miel'), noun: S('the honey', '蜂蜜', 'le miel'),
+            res: S(`Bruno licked the honey off a leaf, slow and sweet, and sighed happily.`, `布鲁从叶子上舔着蜂蜜，又慢又甜，开心地叹了口气。`, `Bruno lèche le miel sur une feuille, lentement, tout sucré, et soupire de bonheur.`) },
+          { e: '🫐', label: S('Blueberries', '蓝莓', 'Des myrtilles'), noun: S('the blueberries', '蓝莓', 'les myrtilles'),
+            res: S(`Pop, pop! Each blueberry was a tiny purple moon.`, `啵、啵！每一颗蓝莓都是一个小小的紫色月亮。`, `Pop, pop ! Chaque myrtille est une minuscule lune violette.`) },
+          { e: '🌰', label: S('Acorns', '橡果', 'Des glands'), noun: S('the acorns', '橡果', 'les glands'),
+            res: S(`Crunch, crunch, softly. Bruno nibbled them one by one.`, `咔嚓，咔嚓，轻轻地。布鲁一颗一颗地啃着。`, `Croc, croc, doucement. Bruno les grignote un par un.`) },
+        ] },
+      { type: 'n', art: ['🐻', '💤'], w: ['🧩', S('mystery', '谜', 'mystère')],
+        t: S(`Bruno’s eyes grew heavy. “That was just what I needed,” he rumbled, finishing {v:snack}. The mystery was solved! Bruno hadn’t been worried at all. His tummy had only needed a snack and a hum.`,
+          `布鲁的眼皮越来越沉。“这正是我需要的，”他低声说，吃完了{v:snack}。谜解开了！布鲁一点也不烦恼，他的肚子只是需要点心和一首哼唱。`,
+          `Les yeux de Bruno deviennent lourds. « C’était exactement ce qu’il me fallait », grogne-t-il en finissant {v:snack}. Le mystère est résolu ! Bruno n’était pas du tout inquiet. Son ventre avait seulement besoin d’un en-cas et d’un petit chant.`) },
+      { type: 'tap', emoji: '🌟', n: 3, art: ['🐻', '🕳️'], w: ['🌟', S('glow star', '夜光星', 'étoile lumineuse')],
+        t: S(`Before leaving, Dot had one more idea. “Let’s leave a night-light for Bruno.” Tap three glow-stars and stick them on the cave ceiling.`,
+          `离开以前，点点又想到一个主意。“我们给布鲁留一盏夜灯吧。”点一点三颗发光的星星，把它们贴到洞顶上。`,
+          `Avant de partir, Dot a une autre idée. « Laissons une veilleuse à Bruno. » Touchez trois étoiles lumineuses et collez-les au plafond de la grotte.`),
+        done: S(`Three little stars shone on the ceiling, like a night-light made just for Bruno.`, `洞顶上亮起三颗小星星，像是专门为布鲁准备的夜灯。`, `Trois petites étoiles brillent au plafond, comme une veilleuse faite pour Bruno.`) },
+      { type: 'n', art: ['🚌', '🌙', '🏡'], w: ['🏡', S('home', '家', 'maison')],
+        t: S(`Quietly, Dot rolled out of the cave and grew back to full size, one soft pop at a time. {H} waved goodbye to the sleeping bear. Dot’s engine hummed the same slow tune as Bruno, all the way home.`,
+          `点点悄悄地开出山洞，一下一下轻轻地“啵”着，变回了原来的大小。{H}向睡着的熊挥手告别。回家的路上，点点的引擎一直哼着和布鲁一样慢慢的调子。`,
+          `Sans bruit, Dot sort de la grotte et reprend sa taille, un petit pop après l’autre. {H} [fait|font] au revoir à l’ours endormi. Pendant tout le chemin du retour, le moteur de Dot fredonne le même air lent que Bruno.`) },
+      { type: 'sleep', art: ['🐻', '🌟', '🚌'], w: ['😴', S('goodnight', '晚安', 'bonne nuit')],
+        t: S(`Back home, Dot parked beside the house with a happy little sigh. Far away in the forest, Bruno snored softly under three glowing stars. The night was warm and still. Everything was calm. Everything was quiet. Everything was ready for sleep.`,
+          `回到家，点点开心地叹了口气，停在房子旁边。远远的森林里，布鲁在三颗发光的星星下轻轻打着呼噜。夜晚温暖又安静。一切都那么平静，那么安静，一切都准备好睡觉了。`,
+          `De retour à la maison, Dot se gare à côté avec un petit soupir heureux. Au loin dans la forêt, Bruno ronfle doucement sous trois étoiles lumineuses. La nuit est chaude et calme. Tout est calme. Tout est silencieux. Tout est prêt pour dormir.`) },
+    ],
+  },
+];
+
+/* ---------- state ---------- */
+const store = {
+  get(k, d) { try { const v = localStorage.getItem('sb_' + k); return v == null ? d : JSON.parse(v); } catch (e) { return d; } },
+  set(k, v) { try { localStorage.setItem('sb_' + k, JSON.stringify(v)); } catch (e) {} },
+};
+const navLang = (navigator.language || 'en').slice(0, 2);
+const st = {
+  lang: store.get('lang', LANGS.includes(navLang) ? navLang : 'en'),
+  heroes: store.get('heroes', []),
+  pal: store.get('pal', 'dog'),
+  voice: store.get('voice', false),
+  music: store.get('music', true),
+  size: store.get('size', 1),
+  view: 'home', story: null, idx: 0, scn: {}, vars: {},
+};
+const app = document.getElementById('app');
+const esc = s => String(s).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+const cap = s => s.charAt(0).toUpperCase() + s.slice(1);
+const ui = (k) => fmt(UI[k][st.lang], st.lang);
+const pal = () => PALS.find(p => p.id === st.pal) || null;
+const DREAMER = { id: 'dreamer', name: '', g: 'm', on: true };
+const active = () => {
+  const a = st.heroes.filter(h => h.on);
+  if (a.length) return a;
+  if (st.heroes.length) return [st.heroes[0]];
+  DREAMER.name = { en: 'Little Dreamer', zh: '小宝贝', fr: 'Petit Rêveur' }[st.lang] || 'Little Dreamer';
+  return [DREAMER];
+};
+
+/* ---------- text formatting ---------- */
+function joinNames(lang) {
+  const n = active().map(h => h.name);
+  if (n.length === 1) return n[0];
+  const sep = lang === 'zh' ? '、' : ', ';
+  const and = { en: ' and ', zh: '和', fr: ' et ' }[lang];
+  return n.slice(0, -1).join(sep) + and + n[n.length - 1];
+}
+function they(lang) {
+  const a = active(), f = a.every(h => h.g === 'f');
+  if (a.length === 1) return { en: f ? 'she' : 'he', zh: f ? '她' : '他', fr: f ? 'elle' : 'il' }[lang];
+  return { en: 'they', zh: f ? '她们' : '他们', fr: f ? 'elles' : 'ils' }[lang];
+}
+function fmt(s, lang) {
+  const plural = active().length > 1;
+  return s
+    .replace(/\[([^\[\]|]*)\|([^\[\]]*)\]/g, (m, a, b) => plural ? b : a)
+    .replace(/\{H\}/g, () => joinNames(lang))
+    .replace(/\{(They|they)\}/g, (m, w) => { const t = they(lang); return w === 'They' ? cap(t) : t; })
+    .replace(/\{([vV]):(\w+)\}/g, (m, c, k) => { const o = st.vars[k]; if (!o) return ''; const t = o.noun[lang]; return c === 'V' ? cap(t) : t; })
+    .replace(/\{(pal|Pal)\}/g, (m, w) => { const p = pal(); if (!p) return ''; const t = p.name[lang]; return w === 'Pal' ? cap(t) : t; });
+}
+function sentences(t) { return t.match(/[^.!?。！？…]+(?:[.!?。！？…]+["”»」)]*|$)\s*/g) || [t]; }
+
+/* ---------- sound ---------- */
+let ac = null;
+function A() {
+  if (!ac) { try { ac = new (window.AudioContext || window.webkitAudioContext)(); } catch (e) {} }
+  if (ac && ac.state === 'suspended') ac.resume();
+  return ac;
+}
+function tone(f, t = 0, d = .3, type = 'sine', v = .12, f2, dest) {
+  const c = A(); if (!c) return;
+  const o = c.createOscillator(), g = c.createGain(), s = c.currentTime + t;
+  o.type = type; o.frequency.setValueAtTime(f, s);
+  if (f2) o.frequency.exponentialRampToValueAtTime(f2, s + d);
+  g.gain.setValueAtTime(.0001, s);
+  g.gain.exponentialRampToValueAtTime(v, s + Math.min(.04, d / 3));
+  g.gain.exponentialRampToValueAtTime(.0001, s + d);
+  o.connect(g); g.connect(dest || c.destination); o.start(s); o.stop(s + d + .05);
+}
+function roar() {
+  const c = A(); if (!c) return;
+  const s = c.currentTime, o = c.createOscillator(), f = c.createBiquadFilter(), g = c.createGain();
+  o.type = 'sawtooth'; o.frequency.setValueAtTime(120, s); o.frequency.exponentialRampToValueAtTime(55, s + 1);
+  f.type = 'lowpass'; f.frequency.value = 380;
+  g.gain.setValueAtTime(.0001, s); g.gain.exponentialRampToValueAtTime(.1, s + .25); g.gain.exponentialRampToValueAtTime(.0001, s + 1.1);
+  o.connect(f); f.connect(g); g.connect(c.destination); o.start(s); o.stop(s + 1.2);
+}
+const SFX = {
+  pop() { tone(520, 0, .14, 'sine', .16, 980); },
+  star() { [660, 880, 1320].forEach((f, i) => tone(f, i * .07, .3, 'triangle', .1)); },
+  owl() { tone(400, 0, .35, 'sine', .2, 330); tone(340, .5, .55, 'sine', .2, 260); },
+  whale() { tone(150, 0, 1.6, 'sine', .22, 340); tone(340, 1.0, 1.6, 'sine', .15, 190); },
+  roar,
+  page() { tone(300, 0, .15, 'sine', .06, 450); },
+  beep() { tone(660, 0, .12, 'square', .05); tone(660, .2, .12, 'square', .05); },
+  choo() { tone(520, 0, .5, 'sine', .15, 500); tone(660, 0, .5, 'sine', .1, 640); },
+  hum() { tone(196, 0, 1.4, 'sine', .18, 170); tone(294, 0, 1.4, 'sine', .06, 255); },
+  art(i = 0) { tone(440 + i * 110, 0, .22, 'triangle', .12, 660 + i * 110); },
+};
+let lullTimer = null, lullGain = null;
+function lullaby() {
+  const c = A(); if (!c || !st.music) return;
+  stopLullaby();
+  lullGain = c.createGain(); lullGain.gain.value = 1; lullGain.connect(c.destination);
+  const n = { C: 261.6, D: 293.7, E: 329.6, F: 349.2, G: 392, A: 440 };
+  'CCGGAAG FFEEDDC'.replace(' ', '').split('').forEach((k, i) => tone(n[k], i * .75 + .2, .7, 'triangle', .08, null, lullGain));
+}
+function stopLullaby() {
+  if (lullGain && ac) { try { lullGain.gain.cancelScheduledValues(ac.currentTime); lullGain.gain.linearRampToValueAtTime(0, ac.currentTime + .25); } catch (e) {} }
+  lullGain = null;
+}
+
+/* ---------- speech ---------- */
+let spk = 0;
+function voiceFor(lang) {
+  try { return speechSynthesis.getVoices().find(v => v.lang.toLowerCase().replace('_', '-').startsWith(lang)) || null; } catch (e) { return null; }
+}
+function stopSpeak() { spk++; try { speechSynthesis.cancel(); } catch (e) {} }
+function speak(parts, hi) {
+  if (!st.voice || !('speechSynthesis' in window)) return;
+  const id = ++spk; speechSynthesis.cancel();
+  const lang = st.lang, v = voiceFor(lang);
+  if (!v && speechSynthesis.getVoices().length) toast(ui('noVoice'));
+  let i = 0;
+  const next = () => {
+    if (id !== spk) return;
+    if (i >= parts.length) { hi && hi(-1); return; }
+    const u = new SpeechSynthesisUtterance(parts[i].trim());
+    u.lang = TTS[lang]; if (v) u.voice = v; u.rate = lang === 'zh' ? .8 : .85; u.pitch = 1.05;
+    const k = i;
+    u.onstart = () => { if (id === spk) hi && hi(k); };
+    u.onend = u.onerror = () => { if (id === spk) { i++; next(); } };
+    speechSynthesis.speak(u);
+  };
+  setTimeout(next, 60);
+}
+let toastT = null;
+function toast(msg) {
+  document.querySelectorAll('.toast').forEach(e => e.remove());
+  const d = document.createElement('div'); d.className = 'toast'; d.textContent = msg; document.body.appendChild(d);
+  clearTimeout(toastT); toastT = setTimeout(() => d.remove(), 3000);
+}
+
+/* ---------- sky ---------- */
+const lerp = (a, b, t) => a + (b - a) * t;
+function hex(h) { return [1, 3, 5].map(i => parseInt(h.slice(i, i + 2), 16)); }
+function mix(h1, h2, t) { const a = hex(h1), b = hex(h2); return 'rgb(' + a.map((x, i) => Math.round(lerp(x, b[i], t))).join(',') + ')'; }
+function setSky(story, p) {
+  const sky = document.getElementById('sky');
+  if (!story) { sky.style.background = 'linear-gradient(#141b55, #0b1033)'; sky.style.setProperty('--stars', .45); return; }
+  sky.style.background = `linear-gradient(${mix(story.sky[0], '#0a0e2e', p * .85)}, ${mix(story.sky[1], '#04061a', p * .85)})`;
+  sky.style.setProperty('--stars', (.3 + p * .7).toFixed(2));
+}
+
+/* ---------- home ---------- */
+function renderHome() {
+  st.view = 'home'; stopSpeak(); stopLullaby(); setSky(null, 0);
+  document.documentElement.lang = st.lang;
+  const L = st.lang;
+  app.innerHTML = `
+  <header class="head">
+    <div class="moon">🌙</div>
+    <h1>${esc(UI.title[L])}</h1>
+    <p>${esc(UI.sub[L])}</p>
+    <div class="seg" role="group" aria-label="Language">${LANGS.map(l => `<button data-a="lang" data-v="${l}" aria-pressed="${l === L}">${LANG_LABEL[l]}</button>`).join('')}</div>
+  </header>
+  <section class="blk">
+    <h2>${esc(UI.who[L])}</h2>
+    <p class="hint">${esc(UI.whoHint[L])}</p>
+    <div class="chips">${st.heroes.map((h, i) => `
+      <span class="chip" role="button" tabindex="0" data-a="hero" data-i="${i}" aria-pressed="${h.on}">
+        <span class="em">${h.g === 'f' ? '👧' : '👦'}</span>${esc(h.name)}
+        ${i > 2 ? `<button class="x" data-a="delhero" data-i="${i}" aria-label="Remove">✕</button>` : ''}
+      </span>`).join('')}</div>
+    <form class="add" id="addForm">
+      <input id="newName" maxlength="14" placeholder="${esc(UI.addName[L])}" autocomplete="off">
+      <select id="newG" aria-label="👧 / 👦"><option value="f">👧</option><option value="m">👦</option></select>
+      <button class="btn" type="submit">${esc(UI.add[L])}</button>
+    </form>
+  </section>
+  <section class="blk">
+    <h2>${esc(UI.pal[L])}</h2>
+    <div class="chips">
+      ${PALS.map(p => `<button class="chip" data-a="pal" data-v="${p.id}" aria-pressed="${st.pal === p.id}"><span class="em">${p.e}</span>${esc(cap(p.name[L]))}</button>`).join('')}
+      <button class="chip" data-a="pal" data-v="" aria-pressed="${!st.pal}">${esc(UI.none[L])}</button>
+    </div>
+  </section>
+  <section class="blk">
+    <h2>${esc(UI.pick[L])}</h2>
+    <div class="cards">${STORIES.map(s => `
+      <button class="card" data-a="story" data-v="${s.id}" style="--c1:${s.c1};--c2:${s.c2}">
+        <span class="big">${s.e}</span><h3>${esc(s.title[L])}</h3><p>${esc(s.blurb[L])}</p>
+        <small>${esc(UI.min[L])} · ${s.scenes.length} ${esc(UI.pages[L])}</small>
+      </button>`).join('')}</div>
+    <div class="row" style="justify-content:flex-start"><button class="btn primary" data-a="surprise">🎲 ${esc(UI.surprise[L])}</button></div>
+  </section>
+  <section class="blk">
+    <div class="switches">
+      <button class="chip" data-a="voice" aria-pressed="${st.voice}"><span class="em">🔊</span>${esc(UI.voice[L])}</button>
+      <button class="chip" data-a="music" aria-pressed="${st.music}"><span class="em">🎵</span>${esc(UI.music[L])}</button>
+    </div>
+  </section>`;
+}
+
+/* ---------- story ---------- */
+const scene = () => st.story.scenes[st.idx];
+const ss = () => (st.scn[st.idx] = st.scn[st.idx] || {});
+const rnd = n => ((n * 9301 + 49297) % 233280) / 233280;
+function isDone() {
+  const sc = scene(), s = ss();
+  if (sc.type === 'choice') return s.pick != null;
+  if (sc.type === 'tap') return (s.taken || []).length >= sc.n;
+  if (sc.type === 'sound') return (s.presses || 0) > 0;
+  return true;
+}
+
+function renderStory(fresh) {
+  st.view = 'story';
+  document.documentElement.lang = st.lang;
+  const total = st.story.scenes.length;
+  app.innerHTML = `
+  <div class="top">
+    <button class="btn" data-a="home" aria-label="${esc(UI.home[st.lang])}">🏠</button>
+    <div class="prog" id="prog"></div>
+    <button class="btn" data-a="cyclelang" aria-label="Language">${LANG_LABEL[st.lang]}</button>
+    <button class="btn" id="bVoice" data-a="voice" aria-label="${esc(UI.voice[st.lang])}">🔊</button>
+    <button class="btn" id="bMusic" data-a="music" aria-label="${esc(UI.music[st.lang])}">🎵</button>
+    <button class="btn" data-a="size" aria-label="Text size">Aa</button>
+  </div>
+  <div id="scene" class="${fresh ? 'enter' : ''}">
+    <div class="stage" id="stage" style="--s1:${st.story.sky[0]};--s2:${st.story.sky[1]};--g:${st.story.ground}">
+      <div class="ground"></div><div id="arts"></div><div id="items"></div><div class="chars" id="chars"></div>
+    </div>
+    <div class="textcard"><p id="txt"></p><div class="word" id="word"></div></div>
+    <div id="act"></div>
+  </div>
+  <div class="nav" id="nav"></div>`;
+  document.documentElement.style.setProperty('--fs', ['1.15rem', '1.4rem', '1.75rem'][st.size] || '1.4rem');
+  drawTop(); drawArts(); drawItems(); drawChars(); drawText(); drawAct(); drawNav();
+  setSky(st.story, st.idx / (total - 1));
+  const p = fmt(scene().t[st.lang], st.lang);
+  speak(sentences(p), hiSentence);
+}
+function drawTop() {
+  const n = st.story.scenes.length;
+  document.getElementById('prog').innerHTML = st.story.scenes.map((_, i) => `<i class="${i <= st.idx ? 'f' : ''}"></i>`).join('');
+  document.getElementById('bVoice').classList.toggle('on', st.voice);
+  document.getElementById('bMusic').classList.toggle('on', st.music);
+}
+function drawArts() {
+  const slots = [[50, 38, 1], [15, 24, .5], [85, 28, .55], [28, 64, .42], [74, 62, .42]];
+  document.getElementById('arts').innerHTML = '<div class="ground" style="display:none"></div>' + scene().art.map((e, i) => {
+    const [x, y, z] = slots[i] || slots[4];
+    return `<button class="art" data-a="art" data-i="${i}" style="left:${x}%;top:${y}%;--z:${z};--d:${(i * .7).toFixed(1)}s" aria-label="${e}">${e}</button>`;
+  }).join('');
+}
+function drawItems() {
+  const sc = scene(), s = ss(), box = document.getElementById('items');
+  if (sc.type !== 'tap') { box.innerHTML = ''; return; }
+  const taken = s.taken || [];
+  box.innerHTML = Array.from({ length: sc.n }, (_, i) => {
+    if (taken.includes(i)) return '';
+    const x = 14 + i * (72 / (sc.n - 1 || 1)) + rnd(st.idx * 31 + i * 17) * 8;
+    const y = 18 + rnd(st.idx * 13 + i * 29 + 5) * 36;
+    return `<button class="item" data-a="item" data-i="${i}" style="left:${x.toFixed(1)}%;top:${y.toFixed(1)}%;animation-delay:${(i * .6).toFixed(1)}s" aria-label="${sc.emoji}">${sc.emoji}</button>`;
+  }).join('');
+}
+function drawChars() {
+  const p = pal();
+  document.getElementById('chars').innerHTML =
+    active().map((h, i) => `<button class="ch" data-a="hero-tap" data-i="${i}"><span class="em">${h.g === 'f' ? '👧' : '👦'}</span><span class="nm">${esc(h.name)}</span></button>`).join('') +
+    (p ? `<button class="ch" data-a="pal-tap"><span class="em">${p.e}</span><span class="nm">${esc(p.name[st.lang])}</span></button>` : '');
+}
+function drawText() {
+  const t = fmt(scene().t[st.lang], st.lang);
+  document.getElementById('txt').innerHTML = sentences(t).map(x => `<span>${esc(x)}</span>`).join('');
+  const w = scene().w;
+  document.getElementById('word').innerHTML = w
+    ? `<em>${w[0]}</em><span>${esc(UI.word[st.lang])}:</span> ${LANGS.map(l => l === st.lang ? `<b>${esc(w[1][l])}</b>` : esc(w[1][l])).join(' · ')}`
+    : '';
+}
+function hiSentence(k) {
+  document.querySelectorAll('#txt span').forEach((el, i) => el.classList.toggle('on', i === k));
+}
+function drawAct() {
+  const sc = scene(), s = ss(), L = st.lang, act = document.getElementById('act');
+  let h = '';
+  if (sc.type === 'choice') {
+    if (s.pick == null) {
+      h = `<p class="hint">${esc(UI.choose[L])}</p><div class="opts3">${sc.opts.map((o, i) => `<button class="opt" data-a="opt" data-i="${i}"><span class="em">${o.e}</span>${esc(o.label[L])}</button>`).join('')}</div>`;
+    } else {
+      const o = sc.opts[s.pick];
+      h = `<div class="result"><span style="font-size:1.6em">${o.e}</span> ${esc(fmt(o.res[L], L))}</div>`;
+    }
+  } else if (sc.type === 'tap') {
+    const got = (s.taken || []).length;
+    h = `<div class="stars" aria-live="polite">${Array.from({ length: sc.n }, (_, i) => i < got ? '⭐' : '☆').join('')}</div>` +
+      (got >= sc.n ? `<div class="result">${esc(fmt(sc.done[L], L))}</div>` : `<p class="hint">${esc(UI.tapHint[L])}</p>`);
+  } else if (sc.type === 'sound') {
+    h = `<button class="bigbtn" id="snd" data-a="snd"><span class="em">${sc.btn.e}</span>${esc(sc.btn.label[L])}</button>` +
+      ((s.presses || 0) > 0 ? `<div class="result">${esc(fmt(sc.done[L], L))}</div>` : `<p class="hint">${esc(UI.soundHint[L])}</p>`);
+  } else if (sc.type === 'sleep') {
+    if (s.finished) {
+      const p = pal();
+      h = `<div class="goodnight"><div class="moon">🌙</div><h2>${esc(ui('goodnight'))}</h2>` +
+        (p ? `<p class="hint" style="font-size:1.1rem">${esc(ui('palLine'))}</p>` : '') +
+        `<div class="row"><button class="btn" data-a="again">${esc(UI.again[L])}</button><button class="btn" data-a="home">${esc(UI.other[L])}</button></div></div>`;
+    } else if (s.breathing) {
+      h = `<div class="breath" id="breath" aria-live="polite"><span id="blabel"></span></div>`;
+    } else {
+      h = `<button class="btn primary" data-a="breathe">🫧 ${esc(UI.breathe[L])}</button>`;
+    }
+  }
+  act.innerHTML = h;
+}
+function drawNav() {
+  const last = st.idx === st.story.scenes.length - 1;
+  document.getElementById('nav').innerHTML =
+    `<button class="btn ghost" data-a="back">◀ ${esc(UI.back[st.lang])}</button>
+     <button class="btn round" data-a="replay" aria-label="${esc(UI.voice[st.lang])}">🔊</button>
+     ${last ? '' : `<button class="btn primary" data-a="next" ${isDone() ? '' : 'disabled'}>${esc(UI.next[st.lang])} ▶</button>`}`;
+}
+
+/* ---------- actions ---------- */
+let breathT = [], wake = null;
+function clearBreath() { breathT.forEach(clearTimeout); breathT = []; }
+function startStory(id) {
+  A();
+  st.story = STORIES.find(s => s.id === id); st.idx = 0; st.scn = {}; st.vars = {};
+  try { navigator.wakeLock && navigator.wakeLock.request('screen').then(w => { wake = w; }).catch(() => {}); } catch (e) {}
+  renderStory(true); window.scrollTo(0, 0);
+}
+function go(d) {
+  clearBreath(); stopSpeak(); stopLullaby();
+  const n = st.story.scenes.length;
+  if (st.idx + d < 0) { renderHome(); return; }
+  st.idx = Math.min(n - 1, st.idx + d);
+  SFX.page(); renderStory(true); window.scrollTo(0, 0);
+}
+function bubble(el, text) {
+  const stage = document.getElementById('stage'), r = el.getBoundingClientRect(), sr = stage.getBoundingClientRect();
+  const b = document.createElement('div'); b.className = 'bub'; b.textContent = text;
+  b.style.left = (r.left - sr.left + r.width / 2) + 'px'; b.style.top = Math.max(4, r.top - sr.top - 30) + 'px';
+  stage.appendChild(b); setTimeout(() => b.remove(), 1300);
+}
+function breathe() {
+  A(); const s = ss(); s.breathing = true; drawAct(); clearBreath();
+  let cycle = 0;
+  const run = () => {
+    const el = document.getElementById('breath'), lb = document.getElementById('blabel');
+    if (!el) return;
+    lb.textContent = ui('in'); el.classList.add('in'); speak([ui('in')]);
+    breathT.push(setTimeout(() => {
+      lb.textContent = ui('out'); el.classList.remove('in'); speak([ui('out')]);
+      breathT.push(setTimeout(() => {
+        cycle++;
+        if (cycle < 3) run(); else finishSleep();
+      }, 4200));
+    }, 4200));
+  };
+  breathT.push(setTimeout(run, 300));
+}
+function finishSleep() {
+  const s = ss(); s.finished = true; s.breathing = false; drawAct(); setSky(st.story, 1);
+  const g = ui('goodnight'); speak([g]); lullaby();
+}
+
+app.addEventListener('click', e => {
+  const t = e.target.closest('[data-a]'); if (!t) return;
+  const a = t.dataset.a, v = t.dataset.v, i = +t.dataset.i;
+  if (a === 'delhero') { e.stopPropagation(); st.heroes.splice(i, 1); store.set('heroes', st.heroes); renderHome(); return; }
+  switch (a) {
+    case 'lang': st.lang = v; store.set('lang', v); renderHome(); break;
+    case 'cyclelang': st.lang = LANGS[(LANGS.indexOf(st.lang) + 1) % 3]; store.set('lang', st.lang); stopSpeak(); renderStory(false); break;
+    case 'hero': st.heroes[i].on = !st.heroes[i].on; if (!st.heroes.some(h => h.on)) st.heroes[i].on = true; store.set('heroes', st.heroes); renderHome(); break;
+    case 'pal': st.pal = v; store.set('pal', v); renderHome(); break;
+    case 'voice': st.voice = !st.voice; store.set('voice', st.voice); if (!st.voice) stopSpeak();
+      if (st.view === 'story') { drawTop(); if (st.voice) speak(sentences(fmt(scene().t[st.lang], st.lang)), hiSentence); } else renderHome(); break;
+    case 'music': st.music = !st.music; store.set('music', st.music); if (!st.music) stopLullaby(); if (st.view === 'story') drawTop(); else renderHome(); break;
+    case 'size': st.size = (st.size + 1) % 3; store.set('size', st.size); document.documentElement.style.setProperty('--fs', ['1.15rem', '1.4rem', '1.75rem'][st.size]); break;
+    case 'story': startStory(v); break;
+    case 'surprise': if (Math.random() < .5) { st.pal = PALS[Math.floor(Math.random() * PALS.length)].id; store.set('pal', st.pal); } startStory(STORIES[Math.floor(Math.random() * STORIES.length)].id); break;
+    case 'home': clearBreath(); stopLullaby(); renderHome(); window.scrollTo(0, 0); break;
+    case 'back': go(-1); break;
+    case 'next': if (isDone()) go(1); break;
+    case 'replay': {
+      const was = st.voice; st.voice = true; speak(sentences(fmt(scene().t[st.lang], st.lang)), hiSentence); st.voice = was; break;
+    }
+    case 'art': SFX.art(i); t.classList.remove('wig'); void t.offsetWidth; t.classList.add('wig'); setTimeout(() => t.classList.remove('wig'), 600); break;
+    case 'hero-tap': {
+      const h = active()[i]; A(); tone(500 + i * 90, 0, .25, 'triangle', .14, 800 + i * 90);
+      t.classList.remove('jump'); void t.offsetWidth; t.classList.add('jump'); bubble(t, h.name + '!'); break;
+    }
+    case 'pal-tap': {
+      const p = pal(); A(); tone(p.f, 0, .12, 'square', .05, p.f * 1.4); tone(p.f * 1.2, .16, .14, 'square', .05, p.f * .9);
+      t.classList.remove('jump'); void t.offsetWidth; t.classList.add('jump'); bubble(t, p.snd[st.lang]); break;
+    }
+    case 'opt': {
+      const s = ss(), o = scene().opts[i]; s.pick = i; st.vars[scene().key] = o; SFX.star();
+      drawAct(); drawNav(); speak([fmt(o.res[st.lang], st.lang)]); break;
+    }
+    case 'item': {
+      const s = ss(); s.taken = (s.taken || []).concat(i); SFX[scene().emoji === '🫧' ? 'pop' : 'star']();
+      bubble(t, '✨'); drawItems(); drawAct(); drawNav();
+      if (s.taken.length >= scene().n) speak([fmt(scene().done[st.lang], st.lang)]);
+      break;
+    }
+    case 'snd': {
+      const s = ss(); s.presses = (s.presses || 0) + 1; SFX[scene().btn.tone]();
+      t.classList.remove('ring'); void t.offsetWidth; t.classList.add('ring');
+      if (s.presses === 1) { drawAct(); drawNav(); speak([fmt(scene().done[st.lang], st.lang)]); }
+      break;
+    }
+    case 'breathe': stopSpeak(); breathe(); break;
+    case 'again': clearBreath(); stopLullaby(); st.idx = 0; st.scn = {}; st.vars = {}; renderStory(true); window.scrollTo(0, 0); break;
+  }
+});
+app.addEventListener('keydown', e => {
+  if ((e.key === 'Enter' || e.key === ' ') && e.target.matches('.chip[data-a="hero"]')) { e.preventDefault(); e.target.click(); }
+});
+app.addEventListener('submit', e => {
+  e.preventDefault();
+  const n = document.getElementById('newName').value.trim(); if (!n) return;
+  st.heroes.push({ id: 'h' + Date.now(), name: n, g: document.getElementById('newG').value, on: true });
+  store.set('heroes', st.heroes); renderHome();
+});
+document.addEventListener('keydown', e => {
+  if (st.view !== 'story' || /INPUT|SELECT|TEXTAREA/.test(e.target.tagName)) return;
+  if (e.key === 'ArrowRight' && isDone() && st.idx < st.story.scenes.length - 1) go(1);
+  if (e.key === 'ArrowLeft') go(-1);
+});
+if ('speechSynthesis' in window) speechSynthesis.onvoiceschanged = () => {};
+renderHome();
+</script>
+
+<script>if ('serviceWorker' in navigator) addEventListener('load', () => navigator.serviceWorker.register('sw.js').catch(() => {}));</script>
+</body>
+</html>
